@@ -7,7 +7,7 @@ public class main {
         Scanner input = new Scanner(System.in);
 
         FAT32Reader f = new FAT32Reader(args[0]);
-        System.out.println(f.getByteContents(12));
+        System.out.println(f.getByteContents(11));
 
         /* Parse args and open our image file */
 
