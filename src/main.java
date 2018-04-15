@@ -3,9 +3,11 @@ import java.util.Scanner;
 public class main {
 
     public static void main(String[] args) {
-        //char cmd_line[MAX_CMD];
         String cmd_line = "";
         Scanner input = new Scanner(System.in);
+
+        FAT32Reader f = new FAT32Reader(args[0]);
+        System.out.println(f.getByteContents(12));
 
         /* Parse args and open our image file */
 
