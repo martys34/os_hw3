@@ -30,6 +30,7 @@ public class main {
             /* Start comparing input */
             if(cmd_line.startsWith("info")) {
                 System.out.println("Going to display info.\n");
+                info();
             }
 
             else if(cmd_line.startsWith("stat ")) {
@@ -69,6 +70,10 @@ public class main {
             else
                 System.out.println("Unrecognized command.\n");
         }
+    }
+
+    private static void info() {
+
     }
 
     private static void stat(String cmd) {
