@@ -30,28 +30,34 @@ public class main {
                 System.out.println("Going to display info.\n");
             }
 
-            else if(cmd_line.startsWith("open")) {
+            else if(cmd_line.startsWith("stat ")) {
                 System.out.println("Going to open!\n");
+                stat(cmd_line.substring(5));
             }
 
-            else if(cmd_line.startsWith("close")) {
+            else if(cmd_line.startsWith("volume")) {
                 System.out.println("Going to close!\n");
+                volume();
             }
 
-            else if(cmd_line.startsWith("size")) {
+            else if(cmd_line.startsWith("size ")) {
                 System.out.println("Going to size!\n");
+                size(cmd_line.substring(5));
             }
 
-            else if(cmd_line.startsWith("cd")) {
+            else if(cmd_line.startsWith("cd ")) {
                 System.out.println("Going to cd!\n");
+                cd(cmd_line.substring(3));
             }
 
             else if(cmd_line.startsWith("ls")) {
                 System.out.println("Going to ls.\n");
+                ls();
             }
 
-            else if(cmd_line.startsWith("read")) {
+            else if(cmd_line.startsWith("read ")) {
                 System.out.println("Going to read!\n");
+                read(cmd_line.substring(5));
             }
 
             else if(cmd_line.startsWith("quit")) {
@@ -61,6 +67,30 @@ public class main {
             else
                 System.out.println("Unrecognized command.\n");
         }
+    }
+
+    private static void stat(String cmd) {
+
+    }
+
+    private static void volume() {
+
+    }
+
+    private static void size(String cmd) {
+
+    }
+
+    private static void cd(String cmd) {
+
+    }
+
+    private static void ls() {
+
+    }
+
+    private static void read(String cmd) {
+
     }
 
 }
