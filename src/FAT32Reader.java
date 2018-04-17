@@ -39,6 +39,8 @@ public class FAT32Reader {
             if(withLeadingZeros.charAt(i) != '0')
                 break;
         }
+        if(withLeadingZeros.substring(i) == "")
+            return "0";
         return withLeadingZeros.substring(i);
     }
 
