@@ -7,6 +7,8 @@ public class main {
         Scanner input = new Scanner(System.in);
 
         FAT32Reader f = new FAT32Reader(args[0]);
+        CommandHandler ch = new CommandHandler();
+
         System.out.println(f.getByteContents(11));
 
         /* Parse args and open our image file */
@@ -30,37 +32,37 @@ public class main {
             /* Start comparing input */
             if(cmd_line.startsWith("info")) {
                 System.out.println("Going to display info.\n");
-                info();
+                ch.info();
             }
 
             else if(cmd_line.startsWith("stat ")) {
                 System.out.println("Going to open!\n");
-                stat(cmd_line.substring(5));
+                ch.stat(cmd_line.substring(5));
             }
 
             else if(cmd_line.startsWith("volume")) {
                 System.out.println("Going to close!\n");
-                volume();
+                ch.volume();
             }
 
             else if(cmd_line.startsWith("size ")) {
                 System.out.println("Going to size!\n");
-                size(cmd_line.substring(5));
+                ch.size(cmd_line.substring(5));
             }
 
             else if(cmd_line.startsWith("cd ")) {
                 System.out.println("Going to cd!\n");
-                cd(cmd_line.substring(3));
+                ch.cd(cmd_line.substring(3));
             }
 
             else if(cmd_line.startsWith("ls")) {
                 System.out.println("Going to ls.\n");
-                ls();
+                ch.ls();
             }
 
             else if(cmd_line.startsWith("read ")) {
                 System.out.println("Going to read!\n");
-                read(cmd_line.substring(5));
+                ch.read(cmd_line.substring(5));
             }
 
             else if(cmd_line.startsWith("quit")) {
@@ -70,34 +72,6 @@ public class main {
             else
                 System.out.println("Unrecognized command.\n");
         }
-    }
-
-    private static void info() {
-
-    }
-
-    private static void stat(String cmd) {
-
-    }
-
-    private static void volume() {
-
-    }
-
-    private static void size(String cmd) {
-
-    }
-
-    private static void cd(String cmd) {
-
-    }
-
-    private static void ls() {
-
-    }
-
-    private static void read(String cmd) {
-
     }
 
 }
