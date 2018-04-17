@@ -33,7 +33,7 @@ public class CommandHandler {
         result.append(", ");
         result.append(fatReader.convertHexToDec(nfHex));
 
-        result.append("\nFATSz32 is 0x");
+        result.append("\nBPB_FATSz32 is 0x");
         String fzHex = fatReader.getBytes(36, 4);
         result.append(fzHex);
         result.append(", ");

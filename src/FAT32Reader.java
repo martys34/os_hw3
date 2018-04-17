@@ -10,23 +10,8 @@ public class FAT32Reader {
 
     public FAT32Reader(String pathToFile){
         try {
-//            File file = new File(pathToFile);
             Path path = Paths.get(pathToFile);
             this.contents = Files.readAllBytes(path);
-//            List<String> hexVals =  new ArrayList<>(this.contents.length);
-//            for(Byte b : this.contents){
-//                hexVals.add(String.format("%02X", b));
-//            }
-//            System.out.println("");
-//            InputStream is = new FileInputStream(file);
-//            int value = 0;
-//            while ((value = is.read()) != -1) {
-//                String hex = Integer.toHexString(value).toUpperCase();
-////              System.out.println(hex);
-//                hexVals.add(hex);
-//            }
-//            is.close();
-
         } catch (IOException e){
             System.out.println(e.getStackTrace());
         }
