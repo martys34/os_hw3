@@ -18,4 +18,14 @@ public class FAT32Reader {
     public byte getByteContents(int index){
         return contents[index];
     }
+
+    public String getBytes(int index, int offset) {
+        StringBuilder result = new StringBuilder();
+
+        for(int i = 0; i < offset; i++) {
+            result.insert(0, contents[index + i]);
+        }
+
+        return result.toString();
+    }
 }
