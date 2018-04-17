@@ -13,31 +13,31 @@ public class CommandHandler {
         String bpsHex = fatReader.getBytes(11, 2);
         result.append(bpsHex);
         result.append(", ");
-        result.append(convertHexToDec(bpsHex));
+        result.append(fatReader.convertHexToDec(bpsHex));
 
         result.append("\nBPB_SecPerClus is 0x");
         String spcHex = fatReader.getBytes(13, 1);
         result.append(spcHex);
         result.append(", ");
-        result.append(convertHexToDec(spcHex));
+        result.append(fatReader.convertHexToDec(spcHex));
 
         result.append("\nBPB_RsvdSecCnt is 0x");
         String rscHex = fatReader.getBytes(14, 2);
         result.append(rscHex);
         result.append(", ");
-        result.append(convertHexToDec(rscHex));
+        result.append(fatReader.convertHexToDec(rscHex));
 
         result.append("\nBPB_NumFATs is 0x");
         String nfHex = fatReader.getBytes(16, 1);
         result.append(nfHex);
         result.append(", ");
-        result.append(convertHexToDec(nfHex));
+        result.append(fatReader.convertHexToDec(nfHex));
 
         result.append("\nFATSz32 is 0x");
         String fzHex = fatReader.getBytes(36, 4);
         result.append(fzHex);
         result.append(", ");
-        result.append(convertHexToDec(fzHex));
+        result.append(fatReader.convertHexToDec(fzHex));
 
         System.out.println(result.toString());
 
