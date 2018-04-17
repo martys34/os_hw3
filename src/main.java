@@ -34,8 +34,8 @@ public class main {
                 ch.info();
             }
 
-            else if(cmd_line.startsWith("stat")) {
-                ch.stat(cmd_line.substring(5));
+            else if(cmd_line.startsWith("stat ")) {
+                ch.stat(cmd_line.substring(5).toLowerCase());
             }
 
             else if(cmd_line.startsWith("volume")) {

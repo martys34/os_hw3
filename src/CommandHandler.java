@@ -59,9 +59,15 @@ public class CommandHandler {
             }
 
             String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
+            name = name.replaceFirst(" ", ".");
+            name = name.replaceAll(" ", "");
+            name = name.toLowerCase();
             int attInt = Integer.parseInt(fatReader.convertHexToDec(
                     fatReader.getBytes(dirOffset + 11, 1)));
             String attribute = attributes.get(attInt);
+            if(attInt == 16) {
+                name = name.substring(0, name.length() - 1);
+            }
             int hi = Integer.parseInt(fatReader.convertHexToDec(
                     fatReader.getBytes(dirOffset + 20, 2)));
             int lo = Integer.parseInt(fatReader.convertHexToDec(
@@ -121,14 +127,14 @@ public class CommandHandler {
             System.out.println("Error: file/directory does not exist");
             return;
         }
-        int nextClusNum = node.getHi() - node.getLo();
+        int nextClusNum = node.getHi() + node.getLo();
 
         result.append("Size is ");
         result.append(node.getSize());
         result.append("\nAttributes ");
         result.append(node.getAttributes());
         result.append("\nNext cluster number is ");
-        result.append(nextClusNum);
+        result.append(fatReader.convertDecToHex(nextClusNum, 2));
 
         System.out.println(result.toString());
 

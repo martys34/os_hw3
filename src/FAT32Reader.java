@@ -92,4 +92,16 @@ public class FAT32Reader {
 
         return hex;
     }
+
+    public String convertDecToHex(int dec, int bytes) {
+        StringBuilder result = new StringBuilder();
+        result.append("0x");
+        String hex = Integer.toHexString(dec);
+        int zeroes = (bytes * 2) - hex.toCharArray().length;
+        for(int i = 0; i < zeroes; i ++) {
+            result.append("0");
+        }
+        result.append(hex);
+        return result.toString();
+    }
 }
