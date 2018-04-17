@@ -47,7 +47,7 @@ public class CommandHandler {
         while(true) {
             int dirOffset = directory + i;
 
-            if(Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 32))) == 0) {
+            if(fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
                 break;
             }
 

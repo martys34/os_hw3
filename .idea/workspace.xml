@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e3ac9870-77ff-4be1-965e-b37aaef9468f" name="Default" comment="&quot;command handler&quot;">
+    <list default="true" id="e3ac9870-77ff-4be1-965e-b37aaef9468f" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/os_hw3/FAT32Reader.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/os_hw3/FAT32Reader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/os_hw3/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/os_hw3/main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommandHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FAT32Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FAT32Reader.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,8 +29,8 @@
       <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CommandHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="25" selection-start-line="25" selection-end-line="25" />
+            <state relative-caret-position="241">
+              <caret line="50" column="22" lean-forward="true" selection-start-line="50" selection-start-column="22" selection-end-line="50" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -52,13 +53,22 @@
       <file leaf-file-name="FAT32Reader.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/FAT32Reader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="24" selection-start-line="24" selection-end-line="24" />
+            <state relative-caret-position="124">
+              <caret line="24" column="48" lean-forward="true" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#511#512#0" expanded="true" />
                 <element signature="e#549#550#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Integer.java" pinned="false" current-in-tab="false">
+        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Integer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="148">
+              <caret line="651" selection-start-line="651" selection-end-line="651" />
             </state>
           </provider>
         </entry>
@@ -89,8 +99,8 @@
       <list>
         <option value="$PROJECT_DIR$/src/main.java" />
         <option value="$PROJECT_DIR$/src/NodeInfo.java" />
-        <option value="$PROJECT_DIR$/src/CommandHandler.java" />
         <option value="$PROJECT_DIR$/src/FAT32Reader.java" />
+        <option value="$PROJECT_DIR$/src/CommandHandler.java" />
       </list>
     </option>
   </component>
@@ -387,11 +397,18 @@
       <option name="project" value="LOCAL" />
       <updated>1523931055737</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="buncha stuff">
+      <created>1523934853782</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1523934853782</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14369000" />
+    <option name="totallyTimeSpent" value="15400000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="61" y="23" width="1316" height="796" extended-state="0" />
@@ -407,7 +424,7 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32904148" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32904148" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32904148" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
@@ -418,7 +435,7 @@
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39914164" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39914164" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info id="Designer" order="3" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -461,7 +478,8 @@
     <MESSAGE value="&quot;fixed fat32reader&quot;" />
     <MESSAGE value="&quot;info done&quot;" />
     <MESSAGE value="&quot;removed useless commented code in fat32reader&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;removed useless commented code in fat32reader&quot;" />
+    <MESSAGE value="buncha stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="buncha stuff" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -472,15 +490,15 @@
           <properties />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/CommandHandler.java</url>
-          <line>25</line>
-          <properties />
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="19" />
+      <option name="time" value="20" />
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="result" />
+        <watch expression="index" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main.java">
@@ -630,10 +648,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Integer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="651" selection-start-line="651" selection-end-line="651" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/FAT32Reader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
+        <state relative-caret-position="124">
+          <caret line="24" column="48" lean-forward="true" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#511#512#0" expanded="true" />
@@ -642,24 +674,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Integer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="661" selection-start-line="661" selection-end-line="661" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CommandHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        <state relative-caret-position="241">
+          <caret line="50" column="22" lean-forward="true" selection-start-line="50" selection-start-column="22" selection-end-line="50" selection-end-column="22" />
         </state>
       </provider>
     </entry>
