@@ -70,7 +70,7 @@ public class FAT32Reader {
 
             temp.append(decimal);
         }
-        System.out.println("Decimal : " + temp.toString());
+        //System.out.println("Decimal : " + temp.toString());
 
         return sb.toString();
     }

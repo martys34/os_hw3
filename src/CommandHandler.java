@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.HashMap;
 
 public class CommandHandler {
@@ -48,6 +50,10 @@ public class CommandHandler {
             int dirOffset = directory + i;
 
             if(fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+                break;
+            }
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 2)));
+            if(check == 0 || check == 229) {
                 break;
             }
 
@@ -109,7 +115,21 @@ public class CommandHandler {
 
     public void stat(String cmd) {
         StringBuilder result = new StringBuilder();
+        NodeInfo node = dirInfo.get(cmd);
+        if(node == null) {
+            System.out.println("Error: file/directory does not exist");
+            return;
+        }
+        int nextClusNum = node.getHi() - node.getLo();
 
+        result.append("Size is ");
+        result.append(node.getSize());
+        result.append("\nAttributes ");
+        result.append(node.getAttributes());
+        result.append("\nNext cluster number is ");
+        result.append(nextClusNum);
+
+        System.out.println(result.toString());
 
     }
 
