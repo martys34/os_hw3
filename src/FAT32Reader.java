@@ -34,12 +34,17 @@ public class FAT32Reader {
         }
 
         String withLeadingZeros = result.toString();
+
+        return removeLeadingZeros(withLeadingZeros);
+    }
+
+    public String removeLeadingZeros(String withLeadingZeros){
         int i;
         for(i = 0; i < withLeadingZeros.length(); i++){
             if(withLeadingZeros.charAt(i) != '0')
                 break;
         }
-        if(withLeadingZeros.substring(i) == "")
+        if(withLeadingZeros.substring(i).equals(""))
             return "0";
         return withLeadingZeros.substring(i);
     }
