@@ -34,7 +34,6 @@ public class FAT32Reader {
         }
 
         String withLeadingZeros = result.toString();
-        result = new StringBuilder();
         int i;
         for(i = 0; i < withLeadingZeros.length(); i++){
             if(withLeadingZeros.charAt(i) != '0')
