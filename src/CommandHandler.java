@@ -32,7 +32,7 @@ public class CommandHandler {
         int resvdSecCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(14, 2)));
         int numFATS = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(16, 1)));
         int FATSz = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)));
-        int firstDataSector = resvdSecCnt + (numFATS + FATSz) + rootDirSectors;
+        int firstDataSector = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
 
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4)));
         int secPerClus = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(13, 1)));
@@ -52,9 +52,10 @@ public class CommandHandler {
             if(fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
                 break;
             }
-            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 2)));
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
             if(check == 0 || check == 229) {
-                break;
+                i += 64;
+                continue;
             }
 
             String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
@@ -73,7 +74,7 @@ public class CommandHandler {
 
             i += 64;
         }
-
+        System.out.println();
     }
 
     public void info() {
@@ -148,8 +149,10 @@ public class CommandHandler {
     public void ls() {
         StringBuilder result = new StringBuilder();
         for(String node : dirInfo.keySet()) {
-            result.append(node);
-            result.append("    ");
+            if(!dirInfo.get(node).getAttributes().equals("ATTR_VOLUME_ID")){
+                result.append(node);
+                result.append("    ");
+            }
         }
         result.delete(result.length() - 4, result.length());
 

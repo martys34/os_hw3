@@ -31,19 +31,20 @@ public class FAT32Reader {
 //            val = 16*val + d;
 //        }
 //        return val;
+//        return "" + val;
+        int decimal = Integer.parseInt(hex, 16);
         return "" + decimal;
-
     }
 
-    public String getBytes(int index, int offset) {
+    public String getBytes(int offset, int size) {
         StringBuilder result = new StringBuilder();
 
-        for(int i = 0; i < 11; i++) {
-            result.append(String.format("%02X", this.contents[1049600 + i]));
+        for(int i = 0; i < size; i++) {
+            result.insert(0, String.format("%02X", this.contents[offset + i]));
         }
 
         String withLeadingZeros = result.toString();
-        System.out.println(withLeadingZeros);
+//        System.out.println(withLeadingZeros);
 
         return removeLeadingZeros(withLeadingZeros);
     }
@@ -81,6 +82,14 @@ public class FAT32Reader {
             temp.append(decimal);
         }
 
-        return sb.toString();
+        hex = sb.toString();
+        sb = new StringBuilder();
+
+        for(int i = hex.length() - 1; i >= 0; i--){
+            sb.append(hex.charAt(i));
+        }
+        hex = sb.toString();
+
+        return hex;
     }
 }

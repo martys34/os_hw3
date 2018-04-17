@@ -7,7 +7,8 @@ public class main {
         Scanner input = new Scanner(System.in);
 
         FAT32Reader f = new FAT32Reader(args[0]);
-        System.out.println(f.convertHexToString("68656c6c6f206d61727479"));
+//        System.out.println(f.convertHexToString("68656c6c6f206d61727479"));
+//        System.out.println(f.convertHexToString("97472716d602f6c6c65686"));
         CommandHandler ch = new CommandHandler(f);
 
         /* Parse args and open our image file */
@@ -33,7 +34,7 @@ public class main {
                 ch.info();
             }
 
-            else if(cmd_line.startsWith("stat ")) {
+            else if(cmd_line.startsWith("stat")) {
                 ch.stat(cmd_line.substring(5));
             }
 
