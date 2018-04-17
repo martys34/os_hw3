@@ -22,18 +22,28 @@ public class FAT32Reader {
     }
 
     public String convertHexToDec(String hex){
-        int decimal = Integer.parseInt(hex, 16);
+//        String digits = "0123456789ABCDEF";
+//        s = s.toUpperCase();
+//        int val = 0;
+//        for (int i = 0; i < s.length(); i++) {
+//            char c = s.charAt(i);
+//            int d = digits.indexOf(c);
+//            val = 16*val + d;
+//        }
+//        return val;
         return "" + decimal;
+
     }
 
     public String getBytes(int index, int offset) {
         StringBuilder result = new StringBuilder();
 
-        for(int i = 0; i < offset; i++) {
-            result.insert(0, String.format("%02X", this.contents[index + i]));
+        for(int i = 0; i < 11; i++) {
+            result.append(String.format("%02X", this.contents[1049600 + i]));
         }
 
         String withLeadingZeros = result.toString();
+        System.out.println(withLeadingZeros);
 
         return removeLeadingZeros(withLeadingZeros);
     }
@@ -70,7 +80,6 @@ public class FAT32Reader {
 
             temp.append(decimal);
         }
-        //System.out.println("Decimal : " + temp.toString());
 
         return sb.toString();
     }

@@ -7,6 +7,7 @@ public class main {
         Scanner input = new Scanner(System.in);
 
         FAT32Reader f = new FAT32Reader(args[0]);
+        System.out.println(f.convertHexToString("68656c6c6f206d61727479"));
         CommandHandler ch = new CommandHandler(f);
 
         /* Parse args and open our image file */
