@@ -48,6 +48,13 @@ public class FAT32Reader {
             result.insert(0, String.format("%02X", this.contents[index + i]));
         }
 
-        return result.toString();
+        String withLeadingZeros = result.toString();
+        result = new StringBuilder();
+        int i;
+        for(i = 0; i < withLeadingZeros.length(); i++){
+            if(withLeadingZeros.charAt(i) != '0')
+                break;
+        }
+        return withLeadingZeros.substring(i);
     }
 }
