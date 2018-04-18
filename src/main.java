@@ -20,8 +20,6 @@ public class main {
         /* Parse boot sector and get information */
 
         /* Get root directory address */
-        //System.out.println("Root addr is 0x%x\n", root_addr);
-
 
 	    /* Main loop.  You probably want to create a helper function
             for each command besides quit. */

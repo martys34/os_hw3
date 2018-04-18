@@ -22,6 +22,8 @@ The stat command takes an argument, and that argument must be in the root direct
 
 The info and ls work by just typing in "info" or "ls".
 
+Type "quit to exit the program."
+
 <h4>Challenges:</h4>
 We encountered many challenges, but after reading through the fat32 spec, as well as some slides online, we got a better grasp of the information necessary to complete part 1. We especially struggled with getting the ls and stat command to print the correct data.
 
