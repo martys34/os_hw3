@@ -1,3 +1,7 @@
+/**
+ * This class is used by the CommandHandler to store data about each file/directory in a directory to be used to process
+ * commands.
+ */
 public class NodeInfo {
     private String name;
     private String attributes;

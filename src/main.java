@@ -1,5 +1,11 @@
 import java.util.Scanner;
 
+/**
+ * This class starts by creating a FAT32Reader instance which takes in the FAT32 img.  It also creates a CommandHandler
+ * instance.  It then accepts commands from the user and checks which command was made and sends it to the CommandHandler
+ * to process.
+ */
+
 public class main {
 
     public static void main(String[] args) {
@@ -7,8 +13,6 @@ public class main {
         Scanner input = new Scanner(System.in);
 
         FAT32Reader f = new FAT32Reader(args[0]);
-//        System.out.println(f.convertHexToString("68656c6c6f206d61727479"));
-//        System.out.println(f.convertHexToString("97472716d602f6c6c65686"));
         CommandHandler ch = new CommandHandler(f);
 
         /* Parse args and open our image file */
@@ -19,13 +23,11 @@ public class main {
         //System.out.println("Root addr is 0x%x\n", root_addr);
 
 
-	/* Main loop.  You probably want to create a helper function
-       for each command besides quit. */
+	    /* Main loop.  You probably want to create a helper function
+            for each command besides quit. */
 
         while(true) {
-            //bzero(cmd_line, MAX_CMD);
             System.out.print("/] ");
-            //fgets(cmd_line,MAX_CMD,stdin);
 
             cmd_line = input.nextLine();
 

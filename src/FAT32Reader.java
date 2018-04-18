@@ -5,6 +5,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class interacts with the FAT32.img. It starts up by reading the bytes from FAT32.img into a byte array and then
+ * interacts only with that byte array afterwards.
+ * This class also handles simple conversions between hex, decimal, and string.
+ */
 public class FAT32Reader {
     private byte[] contents;
 
@@ -17,25 +22,14 @@ public class FAT32Reader {
         }
     }
 
-    public byte getByteContents(int index){
-        return contents[index];
-    }
 
-    public String convertHexToDec(String hex){
-//        String digits = "0123456789ABCDEF";
-//        s = s.toUpperCase();
-//        int val = 0;
-//        for (int i = 0; i < s.length(); i++) {
-//            char c = s.charAt(i);
-//            int d = digits.indexOf(c);
-//            val = 16*val + d;
-//        }
-//        return val;
-//        return "" + val;
-        int decimal = Integer.parseInt(hex, 16);
-        return "" + decimal;
-    }
-
+    /**
+     * Returns bytes from the FAT32.img.  An offset and size are passed in and the bytes in that range are returned
+     * in a String form.
+     * @param offset
+     * @param size
+     * @return String representation of the bytes requested.
+     */
     public String getBytes(int offset, int size) {
         StringBuilder result = new StringBuilder();
 
@@ -44,11 +38,15 @@ public class FAT32Reader {
         }
 
         String withLeadingZeros = result.toString();
-//        System.out.println(withLeadingZeros);
 
         return removeLeadingZeros(withLeadingZeros);
     }
 
+    /**
+     * Removes leading zeroes from a String representing a hexadecimal number.
+     * @param withLeadingZeros
+     * @return String representation of hex number without leading zeroes.
+     */
     public String removeLeadingZeros(String withLeadingZeros){
         int i;
         for(i = 0; i < withLeadingZeros.length(); i++){
@@ -58,6 +56,16 @@ public class FAT32Reader {
         if(withLeadingZeros.substring(i).equals(""))
             return "0";
         return withLeadingZeros.substring(i);
+    }
+
+    /**
+     * Converts a String representing a hexadecimal number into a decimal number.
+     * @param hex
+     * @return String representation of decimal value.
+     */
+    public String convertHexToDec(String hex){
+        int decimal = Integer.parseInt(hex, 16);
+        return "" + decimal;
     }
 
     /**
@@ -93,6 +101,12 @@ public class FAT32Reader {
         return hex;
     }
 
+    /**
+     * Converts an int into a String representation of a hexadecimal number with a given number of bytes.
+     * @param dec
+     * @param bytes
+     * @return String representation of hex number
+     */
     public String convertDecToHex(int dec, int bytes) {
         StringBuilder result = new StringBuilder();
         result.append("0x");

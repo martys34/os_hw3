@@ -2,6 +2,11 @@ import org.w3c.dom.Node;
 
 import java.util.HashMap;
 
+/**
+ * This command handler accepts the commands from the main class and uses the FAT32Reader class to extract data.
+ * Also creates NodeInfo instances to store information about files/directories.
+ */
+
 public class CommandHandler {
 
     private FAT32Reader fatReader;
@@ -9,6 +14,13 @@ public class CommandHandler {
     private int currentDir;
     private HashMap<Integer, String> attributes;
 
+    /**
+     * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
+     * it loads up all information needed about that directory to process ls and stat commands
+     * Also fills the "attributes" HashMap which stores the proper attribute string associated which each number,
+     * for use when gathering data about each file/directory in the current directory
+     * @param f
+     */
     public CommandHandler(FAT32Reader f) {
         this.fatReader = f;
         this.currentDir = getRootDir();
@@ -24,6 +36,11 @@ public class CommandHandler {
         gatherData(currentDir);
     }
 
+    /**
+     * Called on startup to find the root directory. Does all the computations needed (which were listed in the FAT32
+     * spec sheet).
+     * @return the offset of the root.
+     */
     public int getRootDir() {
         int rootEntCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(17, 2)));
         int bytesPerSec = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(11, 2)));
@@ -44,6 +61,14 @@ public class CommandHandler {
 
     }
 
+    /**
+     * Gathers the data about whatever directory was passed in.
+     * Fills "dirInfo" HashMap with "NodeInfo" objects which each represent on file or directory within the directory
+     * passed in.
+     * Uses offsets to find the name, attribute, hi, lo, and size of each file/directory and then create the NodeInfo
+     * object
+     * @param directory
+     */
     public void gatherData(int directory) {
         int i = 0;
         while(true) {
@@ -80,9 +105,11 @@ public class CommandHandler {
 
             i += 64;
         }
-        System.out.println();
     }
 
+    /**
+     * Uses offsets to find all information needed to be returned in info.
+     */
     public void info() {
         StringBuilder result = new StringBuilder();
 
@@ -120,6 +147,12 @@ public class CommandHandler {
 
     }
 
+    /**
+     * Takes in the file/directory name which "stat" is being called on. Uses this name as the key into the "dirInfo"
+     * HashMap to get the NodeInfo object which corresponds to that file/directory.  Then pulls out any data that needs
+     * to be returned.
+     * @param cmd
+     */
     public void stat(String cmd) {
         StringBuilder result = new StringBuilder();
         NodeInfo node = dirInfo.get(cmd);
@@ -152,6 +185,10 @@ public class CommandHandler {
 
     }
 
+    /**
+     * Uses the keyset from "dirInfo" to return the names of all files/directories in the current directory.  Checks to
+     * make sure they are not the root directory of the file tree before returning them.
+     */
     public void ls() {
         StringBuilder result = new StringBuilder();
         for(String node : dirInfo.keySet()) {
