@@ -11,8 +11,15 @@ public class CommandHandler {
 
     private FAT32Reader fatReader;
     private HashMap<String, NodeInfo> dirInfo;
+
     private int currentDir;
     private HashMap<Integer, String> attributes;
+
+    private int resvdSecCnt;
+    private int numFATS;
+    private int FATSz;
+    private int rootDirSectors;
+    private int secPerClus;
 
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
@@ -44,15 +51,15 @@ public class CommandHandler {
     public int getRootDir() {
         int rootEntCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(17, 2)));
         int bytesPerSec = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(11, 2)));
-        int rootDirSectors = ((rootEntCnt * 32) + (bytesPerSec - 1)) / bytesPerSec;
+        rootDirSectors = ((rootEntCnt * 32) + (bytesPerSec - 1)) / bytesPerSec;
 
-        int resvdSecCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(14, 2)));
-        int numFATS = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(16, 1)));
-        int FATSz = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)));
+        resvdSecCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(14, 2)));
+        numFATS = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(16, 1)));
+        FATSz = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)));
         int firstDataSector = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
 
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4)));
-        int secPerClus = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(13, 1)));
+        secPerClus = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(13, 1)));
         int firstSecOfClus = (n - 2) * secPerClus + firstDataSector;
 
         int root = firstSecOfClus * bytesPerSec;
@@ -182,6 +189,13 @@ public class CommandHandler {
     }
 
     public void cd(String cmd) {
+        NodeInfo node = dirInfo.get(cmd);
+        int n = node.getHi() + node.getLo();
+        int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+        int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+        this.currentDir = firstSecOfClus;
+        dirInfo.clear();
+        gatherData(currentDir);
 
     }
 
