@@ -20,6 +20,7 @@ public class CommandHandler {
     private int FATSz;
     private int rootDirSectors;
     private int secPerClus;
+    private int bytesPerSec;
 
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
@@ -50,7 +51,7 @@ public class CommandHandler {
      */
     public int getRootDir() {
         int rootEntCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(17, 2)));
-        int bytesPerSec = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(11, 2)));
+        bytesPerSec = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(11, 2)));
         rootDirSectors = ((rootEntCnt * 32) + (bytesPerSec - 1)) / bytesPerSec;
 
         resvdSecCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(14, 2)));
@@ -193,7 +194,7 @@ public class CommandHandler {
         int n = node.getHi() + node.getLo();
         int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
         int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-        this.currentDir = firstSecOfClus;
+        this.currentDir = firstSecOfClus * bytesPerSec;
         dirInfo.clear();
         gatherData(currentDir);
 
