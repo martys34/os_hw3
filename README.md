@@ -5,7 +5,7 @@
     <li>main.java: starts up the program, sets up data structures to be used by ls, stat, cd, volume, read, and size commands by calling FAT32Reader.java and CommandHandler.java</li>
     <li>FAT32Reader.java: pulls all data from the fat32.img file and stores it into a byte array for later retreival. Contails useful methods to interpret the contents of the array</li>
     <li>CommandHandler.java: handles the commands passed by user such as info, ls, stat, cd, read, size and volume and calls the appropriate methods in FAT32Reader.java with the proper offsets defined in the FAT32 spec</li>
-    <li>NodeInfor.java: useful struct like class to keep information about each file/directory in the file system</li>
+    <li>NodeInfo.java: useful struct like class to keep information about each file/directory in the file system</li>
     <li>fat32.img: the img file, which must be passed as a command line argument, whose contents will be read</li>
 </ul>
 
