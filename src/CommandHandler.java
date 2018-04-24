@@ -58,7 +58,7 @@ public class CommandHandler {
      * spec sheet).
      * @return the offset of the root.
      */
-    public int getRootDir() {
+    private int getRootDir() {
         int rootEntCnt = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(17, 2)));
         bytesPerSec = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(11, 2)));
         rootDirSectors = ((rootEntCnt * 32) + (bytesPerSec - 1)) / bytesPerSec;
@@ -86,7 +86,7 @@ public class CommandHandler {
      * object
      * @param directory
      */
-    public void gatherData(int directory) {
+    private void gatherData(int directory) {
         int i = 0;
         if(updatedN) {
             i = 32;
@@ -207,10 +207,17 @@ public class CommandHandler {
 
     }
 
+    /**
+     * Prints out the volume id of the volume which was collected when object was created.
+     */
     public void volume() {
         System.out.println(this.volumeID);
     }
 
+    /**
+     * Prints the size of the node.
+     * @param cmd the node whose size is desired
+     */
     public void size(String cmd) {
         StringBuilder result = new StringBuilder();
         NodeInfo node = dirInfo.get(cmd);
@@ -223,6 +230,10 @@ public class CommandHandler {
         System.out.println(result.toString());
     }
 
+    /**
+     * Changes the current directory to the a child directory
+     * @param cmd the directory to be entered
+     */
     public void cd(String cmd) {
         NodeInfo node = dirInfo.get(cmd);
         if(node == null) {
@@ -283,6 +294,11 @@ public class CommandHandler {
         System.out.println(result.toString().toUpperCase());
     }
 
+    /**
+     * Parses cmd to read from a file at supplied position value for supplied number of bytes, and prints it to the screen.
+     * e.g. read file.txt 100 34 will read from file.txt starting at byte 100 and will print out the next 34 bytes.
+     * @param cmd the command to read from a file.
+     */
     public void read(String cmd) {
         String[] split = cmd.split(" ");
         if(split.length < 3) {
@@ -303,6 +319,12 @@ public class CommandHandler {
         System.out.println(result);
     }
 
+    /**
+     * Updates the value of N that is used for finding the offset of a directory to determine if it spans multiple
+     * clusters. If the value of N that is returned is >= 268435448, then the end of the cluster has been reached.
+     * @param n the previous value of N
+     * @return the new value of N found in the FAT table
+     */
     private int updateN(int n) {
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
@@ -313,6 +335,12 @@ public class CommandHandler {
                 (this.fatReader.getBytes(fatTable + thisFATEntOffset, 4)));
     }
 
+    /**
+     * Gets the value of N from the supplied hi and lo values of a node
+     * @param hi the hi value of the node
+     * @param lo the lo value of the node
+     * @return the corresponding value of N
+     */
     private int getN(int hi, int lo) {
         String hiHex = fatReader.convertDecToHex(hi, 2);
         String loHex = fatReader.convertDecToHex(lo, 2);
@@ -321,6 +349,14 @@ public class CommandHandler {
         return Integer.parseInt(fatReader.convertHexToDec(hex));
     }
 
+    /**
+     * Reads bytes from a file represented as an integer offset found in the FAT32 img. Reading starts at
+     * the position supplied, and reads the bytes (supplied) number of bytes starting from position
+     * @param file the offset of the file to be read
+     * @param position where to start reading
+     * @param bytes how many bytes to read
+     * @return a String containing the bytes read from the file
+     */
     private String readBytes(int file, int position, int bytes) {
         StringBuilder result = new StringBuilder();
         for(int count = 0; count < bytes; count++) {

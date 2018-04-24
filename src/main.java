@@ -27,7 +27,7 @@ public class main {
         while(true) {
             System.out.print("/] ");
 
-            cmd_line = input.nextLine();
+            cmd_line = input.nextLine().toLowerCase();
 
             /* Start comparing input */
             if(cmd_line.startsWith("info")) {
@@ -35,7 +35,7 @@ public class main {
             }
 
             else if(cmd_line.startsWith("stat ")) {
-                ch.stat(cmd_line.substring(5).toLowerCase().trim());
+                ch.stat(cmd_line.substring(5).trim());
             }
 
             else if(cmd_line.startsWith("volume")) {
@@ -43,11 +43,11 @@ public class main {
             }
 
             else if(cmd_line.startsWith("size ")) {
-                ch.size(cmd_line.substring(5).toLowerCase().trim());
+                ch.size(cmd_line.substring(5).trim());
             }
 
             else if(cmd_line.startsWith("cd ")) {
-                ch.cd(cmd_line.substring(3).toLowerCase().trim());
+                ch.cd(cmd_line.substring(3).trim());
             }
 
             else if(cmd_line.startsWith("ls")) {
@@ -55,7 +55,7 @@ public class main {
             }
 
             else if(cmd_line.startsWith("read ")) {
-                ch.read(cmd_line.substring(5).toLowerCase().trim());
+                ch.read(cmd_line.substring(5).trim());
             }
 
             else if(cmd_line.startsWith("quit")) {
