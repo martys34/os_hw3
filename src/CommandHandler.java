@@ -28,6 +28,7 @@ public class CommandHandler {
 
     private boolean dots = false;
     private boolean updatedN = false;
+    private int levelsIn;
 
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
@@ -46,6 +47,8 @@ public class CommandHandler {
         attributes.put(8, "ATTR_VOLUME_ID");
         attributes.put(16, "ATTR_DIRECTORY");
         attributes.put(32, "ATTR_ARCHIVE");
+
+        this.levelsIn = 0;
 
         gatherData(getRootDir());
     }
@@ -230,6 +233,17 @@ public class CommandHandler {
             System.out.println("Error: cannot cd into a file.");
             return;
         }
+        if(cmd.equals("..")) {
+            levelsIn--;
+            if(levelsIn == 0) {
+                dirInfo.clear();
+                gatherData(getRootDir());
+                return;
+            }
+        }
+        else {
+            levelsIn++;
+        }
         this.dots = true;
 
         int n = getN(node.getHi(), node.getLo());
@@ -266,7 +280,7 @@ public class CommandHandler {
         }
         result.delete(result.length() - 4, result.length());
 
-        System.out.println(result.toString());
+        System.out.println(result.toString().toUpperCase());
     }
 
     public void read(String cmd) {
@@ -280,7 +294,13 @@ public class CommandHandler {
         int position = Integer.parseInt(split[1]);
         int bytes = Integer.parseInt(split[2]);
         NodeInfo node = dirInfo.get(name);
+        int n = getN(node.getHi(), node.getLo());
+        int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+        int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+        int file = firstSecOfClus * bytesPerSec;
 
+        String result = readBytes(file, position, bytes);
+        System.out.println(result);
     }
 
     private int updateN(int n) {
@@ -301,20 +321,16 @@ public class CommandHandler {
         return Integer.parseInt(fatReader.convertHexToDec(hex));
     }
 
-    private String readBytes(int position, int bytes) {
+    private String readBytes(int file, int position, int bytes) {
         StringBuilder result = new StringBuilder();
-        int i = 0;
-        while(true) {
-            int dirOffset = directory + i;
-
-            if(i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
-                break;
+        for(int count = 0; count < bytes; count++) {
+            String letter = fatReader.getBytes(file + position + count, 1);
+            if(Integer.parseInt(fatReader.convertHexToDec
+                    (fatReader.getBytes(file + position + count, 4))) == 268435448) {
+                file = updateN(file);
             }
-            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
-            if(check == 0 || check == 229) {
-                i += 64;
-                continue;
-            }
+            result.append(fatReader.convertHexToString(letter));
         }
+        return result.toString();
     }
 }
