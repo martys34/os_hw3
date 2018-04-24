@@ -55,7 +55,7 @@ public class main {
             }
 
             else if(cmd_line.startsWith("read ")) {
-                ch.read(cmd_line.substring(5));
+                ch.read(cmd_line.substring(5).trim().toLowerCase());
             }
 
             else if(cmd_line.startsWith("quit")) {

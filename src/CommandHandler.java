@@ -1,6 +1,9 @@
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This command handler accepts the commands from the main class and uses the FAT32Reader class to extract data.
@@ -12,7 +15,6 @@ public class CommandHandler {
     private FAT32Reader fatReader;
     private HashMap<String, NodeInfo> dirInfo;
 
-    private int currentDir;
     private HashMap<Integer, String> attributes;
 
     private int resvdSecCnt;
@@ -21,6 +23,11 @@ public class CommandHandler {
     private int rootDirSectors;
     private int secPerClus;
     private int bytesPerSec;
+
+    private String volumeID;
+
+    private boolean dots = false;
+    private boolean updatedN = false;
 
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
@@ -31,7 +38,6 @@ public class CommandHandler {
      */
     public CommandHandler(FAT32Reader f) {
         this.fatReader = f;
-        this.currentDir = getRootDir();
         this.dirInfo = new HashMap<>();
         this.attributes = new HashMap<>();
         attributes.put(1, "ATTR_READ_ONLY");
@@ -41,7 +47,7 @@ public class CommandHandler {
         attributes.put(16, "ATTR_DIRECTORY");
         attributes.put(32, "ATTR_ARCHIVE");
 
-        gatherData(currentDir);
+        gatherData(getRootDir());
     }
 
     /**
@@ -79,10 +85,13 @@ public class CommandHandler {
      */
     public void gatherData(int directory) {
         int i = 0;
+        if(updatedN) {
+            i = 32;
+        }
         while(true) {
             int dirOffset = directory + i;
 
-            if(fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+            if(i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
                 break;
             }
             Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
@@ -92,13 +101,18 @@ public class CommandHandler {
             }
 
             String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
-            name = name.replaceFirst(" ", ".");
+            if(!name.startsWith(".")) {
+                name = name.replaceFirst(" ", ".");
+            }
             name = name.replaceAll(" ", "");
             name = name.toLowerCase();
             int attInt = Integer.parseInt(fatReader.convertHexToDec(
                     fatReader.getBytes(dirOffset + 11, 1)));
             String attribute = attributes.get(attInt);
-            if(attInt == 16) {
+            if(attInt == 8) {
+                this.volumeID = name.toUpperCase().replace(".", "");
+            }
+            if(attInt == 16 && !name.startsWith(".")) {
                 name = name.substring(0, name.length() - 1);
             }
             int hi = Integer.parseInt(fatReader.convertHexToDec(
@@ -111,7 +125,16 @@ public class CommandHandler {
             NodeInfo node = new NodeInfo(name, attribute, lo, hi, size);
             dirInfo.put(name, node);
 
-            i += 64;
+            if(this.dots) {
+                if(name.equals(".")) {
+                    this.dots = false;
+                }
+                i += 32;
+            }
+            else {
+                i += 64;
+            }
+
         }
     }
 
@@ -165,7 +188,7 @@ public class CommandHandler {
         StringBuilder result = new StringBuilder();
         NodeInfo node = dirInfo.get(cmd);
         if(node == null) {
-            System.out.println("Error: file/directory does not exist");
+            System.out.println("Error: file/directory does not exist.");
             return;
         }
         int nextClusNum = node.getHi() + node.getLo();
@@ -182,22 +205,49 @@ public class CommandHandler {
     }
 
     public void volume() {
-
+        System.out.println(this.volumeID);
     }
 
     public void size(String cmd) {
-
+        StringBuilder result = new StringBuilder();
+        NodeInfo node = dirInfo.get(cmd);
+        if(node == null) {
+            System.out.println("Error: file/directory does not exist.");
+            return;
+        }
+        result.append("Size is ");
+        result.append(node.getSize());
+        System.out.println(result.toString());
     }
 
     public void cd(String cmd) {
         NodeInfo node = dirInfo.get(cmd);
-        int n = node.getHi() + node.getLo();
-        int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-        int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-        this.currentDir = firstSecOfClus * bytesPerSec;
-        dirInfo.clear();
-        gatherData(currentDir);
+        if(node == null) {
+            System.out.println("Error: file/directory does not exist.");
+            return;
+        }
+        if(!node.getAttributes().equals("ATTR_DIRECTORY")) {
+            System.out.println("Error: cannot cd into a file.");
+            return;
+        }
+        this.dots = true;
 
+        int n = getN(node.getHi(), node.getLo());
+
+        dirInfo.clear();
+
+        //decimal value of EOC (end of cluster)
+        while(n < 268435448) {
+            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+            int dir = firstSecOfClus * bytesPerSec;
+            gatherData(dir);
+            n = updateN(n);
+            updatedN = true;
+        }
+
+        this.dots= false;
+        updatedN = false;
     }
 
     /**
@@ -206,7 +256,9 @@ public class CommandHandler {
      */
     public void ls() {
         StringBuilder result = new StringBuilder();
-        for(String node : dirInfo.keySet()) {
+        List<String> sortedNames = new ArrayList<>(dirInfo.keySet());
+        Collections.sort(sortedNames);
+        for(String node : sortedNames) {
             if(!dirInfo.get(node).getAttributes().equals("ATTR_VOLUME_ID")){
                 result.append(node);
                 result.append("    ");
@@ -218,6 +270,51 @@ public class CommandHandler {
     }
 
     public void read(String cmd) {
+        String[] split = cmd.split(" ");
+        if(split.length < 3) {
+            System.out.println("Error: please enter file, position, number of bytes.");
+            return;
+        }
 
+        String name = split[0];
+        int position = Integer.parseInt(split[1]);
+        int bytes = Integer.parseInt(split[2]);
+        NodeInfo node = dirInfo.get(name);
+
+    }
+
+    private int updateN(int n) {
+        int fatOffset = n * 4;
+        int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
+        int thisFATEntOffset = fatOffset % bytesPerSec;
+        int fatTable = thisFATSecNum * bytesPerSec;
+
+        return Integer.parseInt(fatReader.convertHexToDec
+                (this.fatReader.getBytes(fatTable + thisFATEntOffset, 4)));
+    }
+
+    private int getN(int hi, int lo) {
+        String hiHex = fatReader.convertDecToHex(hi, 2);
+        String loHex = fatReader.convertDecToHex(lo, 2);
+        //gets rid of 0x
+        String hex = hiHex.substring(2) + loHex.substring(2);
+        return Integer.parseInt(fatReader.convertHexToDec(hex));
+    }
+
+    private String readBytes(int position, int bytes) {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while(true) {
+            int dirOffset = directory + i;
+
+            if(i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+                break;
+            }
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
+            if(check == 0 || check == 229) {
+                i += 64;
+                continue;
+            }
+        }
     }
 }
