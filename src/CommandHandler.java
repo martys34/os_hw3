@@ -146,13 +146,23 @@ public class CommandHandler {
     }
 
     private void constructFreeListData() {
-        int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4)));
+        int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
         int thisFATEntOffset = fatOffset % bytesPerSec;
-        int fatTable = thisFATSecNum * bytesPerSec;
+        int bytesPerClus = bytesPerSec * this.secPerClus;
+        int fatTable = thisFATSecNum * bytesPerClus;
 
+        int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
 
+        int fatIndex = 0;
+        for(int i = fatTable; i < fatTable2Index; i+=4){
+            int bytes = Integer.parseInt(this.fatReader.convertHexToDec(this.fatReader.getBytes(i, 4)));
+            if(bytes == 0){
+                this.freeClusterIndices.add(fatIndex);
+            }
+            fatIndex++;
+        }
     }
 
     /**
@@ -385,6 +395,9 @@ public class CommandHandler {
     }
 
     public void freeList() {
-
+        System.out.println("First free cluster: " + this.freeClusterIndices.get(0));
+        System.out.println("Second free cluster: " + this.freeClusterIndices.get(1));
+        System.out.println("Three free cluster: " + this.freeClusterIndices.get(2));
+        System.out.println("Number of free clusters: " + this.freeClusterIndices.size());
     }
 }
