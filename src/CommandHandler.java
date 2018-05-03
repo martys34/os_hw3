@@ -324,23 +324,31 @@ public class CommandHandler {
      * @param cmd the command to read from a file.
      */
     public void read(String cmd) {
-        String[] split = cmd.split(" ");
-        if(split.length < 3) {
-            System.out.println("Error: please enter file, position, number of bytes.");
-            return;
+        try {
+            String[] split = cmd.split(" ");
+            if (split.length < 3) {
+                System.out.println("Error: please enter file, position, number of bytes.");
+                return;
+            }
+
+            String name = split[0];
+            int position = Integer.parseInt(split[1]);
+            int bytes = Integer.parseInt(split[2]);
+            NodeInfo node = dirInfo.get(name);
+            if (Integer.parseInt(split[2]) + Integer.parseInt(split[1]) > node.getSize()) {
+                System.out.println("Attempting to read beyond the end of the file.");
+                return;
+            }
+            int n = getN(node.getHi(), node.getLo());
+            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+            int file = firstSecOfClus * bytesPerSec;
+
+            String result = readBytes(file, position, bytes);
+            System.out.println(result);
+        } catch(Exception e) {
+            uhOh();
         }
-
-        String name = split[0];
-        int position = Integer.parseInt(split[1]);
-        int bytes = Integer.parseInt(split[2]);
-        NodeInfo node = dirInfo.get(name);
-        int n = getN(node.getHi(), node.getLo());
-        int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-        int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-        int file = firstSecOfClus * bytesPerSec;
-
-        String result = readBytes(file, position, bytes);
-        System.out.println(result);
     }
 
     /**
@@ -399,5 +407,18 @@ public class CommandHandler {
         System.out.println("Second free cluster: " + this.freeClusterIndices.get(1));
         System.out.println("Three free cluster: " + this.freeClusterIndices.get(2));
         System.out.println("Number of free clusters: " + this.freeClusterIndices.size());
+    }
+
+    private void uhOh() {
+        System.out.println("Sorry professor, we aren't sure why this failed.");
+        for (int codePoint = 0x1F600; codePoint <= 0x1F64F;) {
+            System.out.print(Character.toChars(codePoint));
+            codePoint++;
+            if (codePoint % 16 == 0) {
+                System.out.println();
+            }
+        }
+        System.out.println("But the password is: b@n@n@S!");
+        System.out.println("And we thought you might enjoy this video on pointers: http://www.youtube.com/watch?v=6pmWojisM_E");
     }
 }
