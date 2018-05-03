@@ -30,6 +30,8 @@ public class CommandHandler {
     private boolean updatedN = false;
     private int levelsIn;
 
+    private ArrayList<Integer> freeClusterIndices;
+
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
      * it loads up all information needed about that directory to process ls and stat commands
@@ -49,8 +51,10 @@ public class CommandHandler {
         attributes.put(32, "ATTR_ARCHIVE");
 
         this.levelsIn = 0;
+        freeClusterIndices = new ArrayList<>();
 
         gatherData(getRootDir());
+        constructFreeListData();
     }
 
     /**
@@ -139,6 +143,16 @@ public class CommandHandler {
             }
 
         }
+    }
+
+    private void constructFreeListData() {
+        int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4)));
+        int fatOffset = n * 4;
+        int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
+        int thisFATEntOffset = fatOffset % bytesPerSec;
+        int fatTable = thisFATSecNum * bytesPerSec;
+
+
     }
 
     /**
@@ -332,5 +346,9 @@ public class CommandHandler {
             result.append(fatReader.convertHexToString(letter));
         }
         return result.toString();
+    }
+
+    public void freeList() {
+
     }
 }

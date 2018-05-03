@@ -58,10 +58,15 @@ public class main {
                 ch.read(cmd_line.substring(5).toLowerCase().trim());
             }
 
+            else if(cmd_line.startsWith("freelist")) {
+                ch.freeList();
+            }
+
             else if(cmd_line.startsWith("quit")) {
                 System.out.println("Quitting.\n");
                 break;
             }
+
             else
                 System.out.println("Unrecognized command.\n");
         }
