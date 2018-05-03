@@ -118,4 +118,11 @@ public class FAT32Reader {
         result.append(hex);
         return result.toString();
     }
+
+    public void writeToImage(int index, int first, int second, int third, int fourth){
+        this.contents[index++] = (byte) fourth;
+        this.contents[index++] = (byte) third;
+        this.contents[index++] = (byte) second;
+        this.contents[index] = (byte) first;
+    }
 }

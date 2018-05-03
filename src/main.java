@@ -62,6 +62,10 @@ public class main {
                 ch.freeList();
             }
 
+            else if(cmd_line.startsWith("newfile ")){
+                ch.newFile(cmd_line.substring(8));
+            }
+
             else if(cmd_line.startsWith("quit")) {
                 System.out.println("Quitting.\n");
                 break;

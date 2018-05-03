@@ -23,6 +23,7 @@ public class CommandHandler {
     private int rootDirSectors;
     private int secPerClus;
     private int bytesPerSec;
+    private int bytesPerClus;
 
     private String volumeID;
 
@@ -150,7 +151,7 @@ public class CommandHandler {
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
         int thisFATEntOffset = fatOffset % bytesPerSec;
-        int bytesPerClus = bytesPerSec * this.secPerClus;
+        this.bytesPerClus = bytesPerSec * this.secPerClus;
         int fatTable = thisFATSecNum * bytesPerClus;
 
         int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
@@ -164,6 +165,8 @@ public class CommandHandler {
             fatIndex++;
         }
     }
+
+
 
     /**
      * Uses offsets to find all information needed to be returned in info.
@@ -407,6 +410,62 @@ public class CommandHandler {
         System.out.println("Second free cluster: " + this.freeClusterIndices.get(1));
         System.out.println("Three free cluster: " + this.freeClusterIndices.get(2));
         System.out.println("Number of free clusters: " + this.freeClusterIndices.size());
+    }
+
+    public void newFile(String cmd){
+        String[] split = cmd.split(" ");
+        if(split.length > 2){
+            System.out.println("newfile command takes in only a filename and a size");
+            return;
+        }
+        String fileName = split[0];
+        if(fileName.length() > 8){
+            System.out.println("filename must be 8 characters or less");
+            return;
+        }
+        if(fileName.length() < 8 ){
+            int toAdd = 8 - fileName.length();
+            for(int i = 0; i < toAdd; i++){
+                fileName = fileName + " ";
+            }
+        }
+
+        int size = 0;
+        try {
+            size = Integer.parseInt(split[1]);
+        } catch (NumberFormatException e){
+            System.out.println("Second argument must be an integer");
+            return;
+        }
+
+        createNewFile(fileName, size);
+    }
+
+    private void createNewFile(String fileName, int size){
+        int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
+        int fatOffset = n * 4;
+        int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
+        int thisFATEntOffset = fatOffset % bytesPerSec;
+        int bytesPerClus = bytesPerSec * this.secPerClus;
+        int fatTable = thisFATSecNum * bytesPerClus;
+
+        int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
+
+        while(size > 0){
+            int firstFreeCluster = this.freeClusterIndices.remove(0);
+            int toWrite = 0;
+            if(size > this.bytesPerClus){
+                toWrite = size - this.bytesPerClus;
+                size -= this.bytesPerClus;
+                this.fatReader.writeToImage(fatTable + firstFreeCluster, this.freeClusterIndices.get(0));
+                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, this.freeClusterIndices.get(0));
+            }
+            else{
+                int
+                this.fatReader.writeToImage(fatTable + firstFreeCluster, 268435448);
+                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, 268435448);
+            }
+        }
     }
 
     private void uhOh() {
