@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -117,6 +118,10 @@ public class FAT32Reader {
         }
         result.append(hex);
         return result.toString();
+    }
+
+    public byte[] convertDecToHexBytes(int dec) {
+        return ByteBuffer.allocate(4).putInt(dec).array();
     }
 
     public void writeToImage(int index, int first, int second, int third, int fourth){
