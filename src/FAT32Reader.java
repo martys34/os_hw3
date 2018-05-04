@@ -13,8 +13,10 @@ import java.util.List;
  */
 public class FAT32Reader {
     private byte[] contents;
+    private String pathToFile;
 
     public FAT32Reader(String pathToFile){
+        this.pathToFile = pathToFile;
         try {
             Path path = Paths.get(pathToFile);
             this.contents = Files.readAllBytes(path);
@@ -135,10 +137,21 @@ public class FAT32Reader {
         return ByteBuffer.allocate(4).putInt(dec).array();
     }
 
-    public void writeToImage(int index, int first, int second, int third, int fourth){
-        this.contents[index++] = (byte) fourth;
-        this.contents[index++] = (byte) third;
-        this.contents[index++] = (byte) second;
-        this.contents[index] = (byte) first;
+    public void writeToImage(int index, byte[] bytes){
+        this.contents[index++] = bytes[3];
+        this.contents[index++] = bytes[2];
+        this.contents[index++] = bytes[1];
+        this.contents[index] = bytes[0];
+
+        FileOutputStream stream = null;
+        try {
+            stream = new FileOutputStream(this.pathToFile);
+            stream.write(this.contents);
+            stream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

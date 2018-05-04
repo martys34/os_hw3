@@ -1,9 +1,6 @@
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * This command handler accepts the commands from the main class and uses the FAT32Reader class to extract data.
@@ -442,6 +439,7 @@ public class CommandHandler {
     }
 
     private void createNewFile(String fileName, int size){
+        //Part 1: write to fat tables:
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
@@ -451,21 +449,64 @@ public class CommandHandler {
 
         int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
 
+        int bytesToWrite = size;
+        int firstN = 0;
+
         while(size > 0){
             int firstFreeCluster = this.freeClusterIndices.remove(0);
+            firstN = firstFreeCluster;
             int toWrite = 0;
             if(size > this.bytesPerClus){
                 toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
-                this.fatReader.writeToImage(fatTable + firstFreeCluster, this.freeClusterIndices.get(0));
-                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, this.freeClusterIndices.get(0));
+                byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
+                this.fatReader.writeToImage(fatTable + firstFreeCluster, bytes);
+                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, bytes);
             }
             else{
-                int
-                this.fatReader.writeToImage(fatTable + firstFreeCluster, 268435448);
-                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, 268435448);
+                byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
+                this.fatReader.writeToImage(fatTable + firstFreeCluster, bytes);
+                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, bytes);
+                break;
             }
         }
+
+        //Part 2: actually create file:
+        byte[] bytes = this.fatReader.convertDecToHexBytes(firstN);
+        String hi = "" + bytes[3] + bytes[2];
+        hi = this.fatReader.convertHexToDec(hi);
+        int nodeHi = Integer.parseInt(hi);
+
+        String lo = "" + bytes[1] + bytes[0];
+        lo = this.fatReader.convertHexToDec(lo);
+        int nodeLo = Integer.parseInt(hi);
+
+        NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
+        this.dirInfo.put(fileName, node);
+
+        int bytesLeft = bytesToWrite;
+        for(int count = 0; count < bytesToWrite; count += this.bytesPerClus){
+
+            byte[] b = getValueBytes("New File.\r\n");
+            if(bytesLeft > this.bytesPerClus){
+                this.fatReader.writeBytes(firstN, this.bytesPerClus, b);
+                bytesLeft -= this.bytesPerClus;
+            }
+            else{
+                this.fatReader.writeBytes(firstN, bytesLeft, b);
+            }
+            firstN = updateN(firstN);
+        }
+    }
+
+    private byte[] getValueBytes(String val){
+        String toAdd = val;
+        int loop = this.bytesPerClus % val.length() / 2;// because every two is one byte.
+        for(int i = 0; i < loop; i++){
+            val += toAdd;
+        }
+        val += "New F";
+        return val.getBytes();
     }
 
     private void uhOh() {
