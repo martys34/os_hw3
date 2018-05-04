@@ -473,13 +473,13 @@ public class CommandHandler {
 
         //Part 2: actually create file:
         byte[] bytes = this.fatReader.convertDecToHexBytes(firstN);
-        String hi = "" + bytes[3] + bytes[2];
+        String hi = "" + String.format("%02X", bytes[0]) + String.format("%02X", bytes[1]);
         hi = this.fatReader.convertHexToDec(hi);
         int nodeHi = Integer.parseInt(hi);
 
-        String lo = "" + bytes[1] + bytes[0];
+        String lo = "" + String.format("%02X", bytes[2]) + String.format("%02X", bytes[3]);
         lo = this.fatReader.convertHexToDec(lo);
-        int nodeLo = Integer.parseInt(hi);
+        int nodeLo = Integer.parseInt(lo);
 
         NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
         this.dirInfo.put(fileName, node);
