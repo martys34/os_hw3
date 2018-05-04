@@ -30,6 +30,8 @@ public class CommandHandler {
 
     private ArrayList<Integer> freeClusterIndices;
 
+    private int currentDir;
+
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
      * it loads up all information needed about that directory to process ls and stat commands
@@ -51,7 +53,8 @@ public class CommandHandler {
         this.levelsIn = 0;
         freeClusterIndices = new ArrayList<>();
 
-        gatherData(getRootDir());
+        this.currentDir = getRootDir();
+        gatherData(this.currentDir);
         constructFreeListData();
     }
 
@@ -272,7 +275,8 @@ public class CommandHandler {
             levelsIn--;
             if(levelsIn == 0) {
                 dirInfo.clear();
-                gatherData(getRootDir());
+                this.currentDir = getRootDir();
+                gatherData(this.currentDir);
                 return;
             }
         }
@@ -285,15 +289,17 @@ public class CommandHandler {
 
         dirInfo.clear();
 
+        int dir = 0;
         //decimal value of EOC (end of cluster)
         while(n < 268435448) {
             int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
             int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-            int dir = firstSecOfClus * bytesPerSec;
+            dir = firstSecOfClus * bytesPerSec;
             gatherData(dir);
             n = updateN(n);
             updatedN = true;
         }
+        this.currentDir = dir;
 
         this.dots= false;
         updatedN = false;
