@@ -43,6 +43,17 @@ public class FAT32Reader {
         return removeLeadingZeros(withLeadingZeros);
     }
 
+    public void writeBytes(int offset, int bytesPerClus, byte[] contents) {
+        int i = offset;
+        for(byte b : contents) {
+            if(i - offset > bytesPerClus) {
+                break;
+            }
+            this.contents[i] = b;
+            i++;
+        }
+    }
+
     /**
      * Removes leading zeroes from a String representing a hexadecimal number.
      * @param withLeadingZeros
