@@ -138,10 +138,10 @@ public class FAT32Reader {
     }
 
     public void writeToImage(int index, byte[] bytes){
-        this.contents[index++] = bytes[3];
-        this.contents[index++] = bytes[2];
         this.contents[index++] = bytes[1];
-        this.contents[index] = bytes[0];
+        this.contents[index++] = bytes[0];
+        this.contents[index++] = bytes[3];
+        this.contents[index] = bytes[2];
 
         FileOutputStream stream = null;
         try {
