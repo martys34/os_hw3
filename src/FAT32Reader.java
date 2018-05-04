@@ -154,4 +154,8 @@ public class FAT32Reader {
 //            e.printStackTrace();
 //        }
     }
+
+    public void writeOneByte(int offset, byte b) {
+        this.contents[offset] = b;
+    }
 }

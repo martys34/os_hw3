@@ -66,6 +66,10 @@ public class main {
                 ch.newFile(cmd_line.substring(8));
             }
 
+            else if(cmd_line.startsWith("delete")) {
+                ch.delete(cmd_line.substring(7));
+            }
+
             else if(cmd_line.startsWith("quit")) {
                 System.out.println("Quitting.\n");
                 break;

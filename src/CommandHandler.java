@@ -417,11 +417,11 @@ public class CommandHandler {
 
     public void newFile(String cmd){
         String[] split = cmd.split(" ");
-        if(split.length > 2){
-            System.out.println("newfile command takes in only a filename and a size");
+        if(split.length != 2){
+            System.out.println("newfile command takes in a filename and a size");
             return;
         }
-        String fileName = split[0];//.split("\\.")[0];
+        String fileName = split[0].split("\\.")[0];
         if(fileName.length() > 8){
             System.out.println("filename must be 8 characters or less");
             return;
@@ -489,7 +489,7 @@ public class CommandHandler {
         int nodeLo = Integer.parseInt(lo);
 
         NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
-        this.dirInfo.put(fileName, node);
+//        this.dirInfo.put(fileName, node);
 
         firstN = getFileLocation(firstN);
 
@@ -507,14 +507,23 @@ public class CommandHandler {
             firstN = updateN(firstN);
         }
 
-//        while(n < 268435448) {
-//            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-//            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-//            int dir = firstSecOfClus * bytesPerSec;
-//            gatherData(dir);
-//            n = updateN(n);
-//            updatedN = true;
-//        }
+        int i = this.currentDir == getRootDir() ? 0 : 32;
+        byte[] name = fileName.getBytes();
+
+        while(true) {
+            int dirOffset = this.currentDir + i;
+
+            if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+                break;
+            }
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
+            if (check == 0 || check == 229) {
+                this.fatReader.writeBytes(dirOffset, 8, name);
+                break;
+            }
+            i += 64;
+        }
+        gatherData(this.currentDir);
     }
 
     private int getFileLocation(int n){
@@ -532,6 +541,48 @@ public class CommandHandler {
         }
         val += "New F";
         return val.getBytes();
+    }
+
+    public void delete(String cmd) {
+        if(!this.dirInfo.keySet().contains(cmd)) {
+            System.out.println("That file does not exist.");
+            return;
+        }
+
+        NodeInfo node = this.dirInfo.get(cmd);
+        int size = node.getSize();
+
+        //Part 1: write to fat tables:
+        int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
+        int fatOffset = n * 4;
+        int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
+        int thisFATEntOffset = fatOffset % bytesPerSec;
+        int bytesPerClus = bytesPerSec * this.secPerClus;
+        int fatTable = thisFATSecNum * bytesPerClus;
+
+        int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
+
+        int bytesToWrite = size;
+        int firstN = 0;
+
+        while(size > 0){
+            int firstFreeCluster = this.freeClusterIndices.remove(0);
+            firstN = firstFreeCluster;
+            int toWrite = 0;
+            if(size > this.bytesPerClus){
+                toWrite = size - this.bytesPerClus;
+                size -= this.bytesPerClus;
+                byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
+                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
+                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
+            }
+            else{
+                byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
+                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
+                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
+                break;
+            }
+        }
     }
 
     private void uhOh() {
