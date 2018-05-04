@@ -138,20 +138,20 @@ public class FAT32Reader {
     }
 
     public void writeToImage(int index, byte[] bytes){
-        this.contents[index++] = bytes[1];
-        this.contents[index++] = bytes[0];
         this.contents[index++] = bytes[3];
-        this.contents[index] = bytes[2];
+        this.contents[index++] = bytes[2];
+        this.contents[index++] = bytes[1];
+        this.contents[index] = bytes[0];
 
-        FileOutputStream stream = null;
-        try {
-            stream = new FileOutputStream(this.pathToFile);
-            stream.write(this.contents);
-            stream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        FileOutputStream stream = null;
+//        try {
+//            stream = new FileOutputStream(this.pathToFile);
+//            stream.write(this.contents);
+//            stream.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

@@ -415,7 +415,7 @@ public class CommandHandler {
             System.out.println("newfile command takes in only a filename and a size");
             return;
         }
-        String fileName = split[0];
+        String fileName = split[0];//.split("\\.")[0];
         if(fileName.length() > 8){
             System.out.println("filename must be 8 characters or less");
             return;
@@ -426,6 +426,7 @@ public class CommandHandler {
                 fileName = fileName + " ";
             }
         }
+//        fileName += "txt";
 
         int size = 0;
         try {
@@ -460,13 +461,13 @@ public class CommandHandler {
                 toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
-                this.fatReader.writeToImage(fatTable + firstFreeCluster, bytes);
-                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, bytes);
+                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
+                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
             }
             else{
                 byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
-                this.fatReader.writeToImage(fatTable + firstFreeCluster, bytes);
-                this.fatReader.writeToImage(fatTable + firstFreeCluster + fatTable2Index, bytes);
+                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
+                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
                 break;
             }
         }
@@ -484,6 +485,8 @@ public class CommandHandler {
         NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
         this.dirInfo.put(fileName, node);
 
+        firstN = getFileLocation(firstN);
+
         int bytesLeft = bytesToWrite;
         for(int count = 0; count < bytesToWrite; count += this.bytesPerClus){
 
@@ -497,6 +500,22 @@ public class CommandHandler {
             }
             firstN = updateN(firstN);
         }
+
+//        while(n < 268435448) {
+//            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+//            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+//            int dir = firstSecOfClus * bytesPerSec;
+//            gatherData(dir);
+//            n = updateN(n);
+//            updatedN = true;
+//        }
+    }
+
+    private int getFileLocation(int n){
+        int firstDataSector = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+        int firstSecOfClus = (n - 2) * secPerClus + firstDataSector;
+        int filelocation = firstSecOfClus * bytesPerClus;
+        return filelocation;
     }
 
     private byte[] getValueBytes(String val){
