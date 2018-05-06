@@ -31,6 +31,8 @@ public class CommandHandler {
     private ArrayList<Integer> freeClusterIndices;
 
     private int currentDir;
+    private int rootDir;
+    private boolean inRootDir;
 
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
@@ -54,6 +56,8 @@ public class CommandHandler {
         freeClusterIndices = new ArrayList<>();
 
         this.currentDir = getRootDir();
+        this.inRootDir = true;
+        this.rootDir = currentDir;
         gatherData(this.currentDir);
         constructFreeListData();
     }
@@ -78,7 +82,7 @@ public class CommandHandler {
         int firstSecOfClus = (n - 2) * secPerClus + firstDataSector;
 
         int root = firstSecOfClus * bytesPerSec;
-
+        this.rootDir = root;
         return root;
 
     }
@@ -275,13 +279,15 @@ public class CommandHandler {
             levelsIn--;
             if(levelsIn == 0) {
                 dirInfo.clear();
-                this.currentDir = getRootDir();
-                gatherData(this.currentDir);
+                this.currentDir = this.rootDir;
+                gatherData(rootDir);
+                inRootDir = true;
                 return;
             }
         }
         else {
             levelsIn++;
+            inRootDir = false;
         }
         this.dots = true;
 
@@ -314,9 +320,14 @@ public class CommandHandler {
         List<String> sortedNames = new ArrayList<>(dirInfo.keySet());
         Collections.sort(sortedNames);
         for(String node : sortedNames) {
-            if(!dirInfo.get(node).getAttributes().equals("ATTR_VOLUME_ID")){
-                result.append(node);
-                result.append("    ");
+            try {
+                if(!dirInfo.get(node).getAttributes().equals("ATTR_VOLUME_ID")){
+                    result.append(node);
+                    result.append("    ");
+//                    System.out.println("File: " + node);
+                }
+            } catch(Exception e) {
+                System.out.println("Failed! Couldn't find ATTR for file " + node);
             }
         }
         result.delete(result.length() - 4, result.length());
@@ -467,11 +478,13 @@ public class CommandHandler {
                 toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
+                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
             }
             else{
                 byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
+                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
                 break;
@@ -496,7 +509,7 @@ public class CommandHandler {
         int bytesLeft = bytesToWrite;
         for(int count = 0; count < bytesToWrite; count += this.bytesPerClus){
 
-            byte[] b = getValueBytes("New File.\r\n");
+            byte[] b = getValueBytes("New File.\r\n", bytesToWrite);
             if(bytesLeft > this.bytesPerClus){
                 this.fatReader.writeBytes(firstN, this.bytesPerClus, b);
                 bytesLeft -= this.bytesPerClus;
@@ -507,7 +520,8 @@ public class CommandHandler {
             firstN = updateN(firstN);
         }
 
-        int i = this.currentDir == getRootDir() ? 0 : 32;
+        int i = this.inRootDir ? 0 : 32;
+//        int i = 0;
         byte[] name = fileName.getBytes();
 
         while(true) {
@@ -519,6 +533,19 @@ public class CommandHandler {
             Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
             if (check == 0 || check == 229) {
                 this.fatReader.writeBytes(dirOffset, 8, name);
+                byte[] type = "TXT".getBytes();
+                this.fatReader.writeBytes(dirOffset + 8, 3, type);
+                byte[] attr = {2,0};
+                this.fatReader.writeBytes(dirOffset + 11, 1, attr);
+
+                byte[] hiByte = hi.getBytes();
+                this.fatReader.writeBytes(dirOffset + 20, 2, hiByte);
+                byte[] loByte = lo.getBytes();
+                this.fatReader.writeBytes(dirOffset + 26, 2, loByte);
+                String sizeString = "" + size;
+                byte[] sizeByte = sizeString.getBytes();
+                this.fatReader.writeBytes(dirOffset + 28, 4, sizeByte);
+
                 break;
             }
             i += 64;
@@ -533,14 +560,15 @@ public class CommandHandler {
         return filelocation;
     }
 
-    private byte[] getValueBytes(String val){
-        String toAdd = val;
-        int loop = this.bytesPerClus % val.length() / 2;// because every two is one byte.
+    private byte[] getValueBytes(String val, int toWrite){
+        String toAdd = "";
+        int pointer = 0;
+        int loop = toWrite;// because every two is one byte.
         for(int i = 0; i < loop; i++){
-            val += toAdd;
+            toAdd += "" + val.charAt(pointer);
+            pointer = ++pointer % val.length();
         }
-        val += "New F";
-        return val.getBytes();
+        return toAdd.getBytes();
     }
 
     public void delete(String cmd) {
