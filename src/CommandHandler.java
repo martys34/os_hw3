@@ -1,6 +1,5 @@
 import org.w3c.dom.Node;
 
-import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -358,6 +357,10 @@ public class CommandHandler {
             int position = Integer.parseInt(split[1]);
             int bytes = Integer.parseInt(split[2]);
             NodeInfo node = dirInfo.get(name);
+            if(node == null){
+                System.out.println("file name: " + name + " doesn't exist");
+                return;
+            }
             if (Integer.parseInt(split[2]) + Integer.parseInt(split[1]) > node.getSize()) {
                 System.out.println("Attempting to read beyond the end of the file.");
                 return;
@@ -524,7 +527,7 @@ public class CommandHandler {
 
             byte[] b = getValueBytes("New File.\r\n", bytesToWrite);
             if (bytesLeft > this.bytesPerClus) {
-                this.fatReader.writeBytes(firstN, this.bytesPerClus, b);
+                this.fatReader.writeBytes(nLocation, this.bytesPerClus, b);
                 bytesLeft -= this.bytesPerClus;
             } else {
                 this.fatReader.writeBytes(nLocation, bytesLeft, b);
