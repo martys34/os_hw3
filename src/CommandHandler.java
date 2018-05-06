@@ -538,12 +538,40 @@ public class CommandHandler {
                 byte[] attr = {2,0};
                 this.fatReader.writeBytes(dirOffset + 11, 1, attr);
 
-                byte[] hiByte = hi.getBytes();
+                byte[] hiByte = new byte[2];
+                int hiInt = Integer.parseInt(hi);
+                String newHi = String.format("%02X", hiInt);
+                if(newHi.length() < 2) {
+                    newHi = "0" + newHi;
+                }
+                for(int j = 0; j < 2; j++) {
+                    int x = Integer.parseInt("" + newHi.charAt(j));
+                    hiByte[j] = (byte) x;
+                }
                 this.fatReader.writeBytes(dirOffset + 20, 2, hiByte);
-                byte[] loByte = lo.getBytes();
+
+                byte[] loByte = new byte[2];
+                int loInt = Integer.parseInt(lo);
+                String newLo = String.format("%02X", loInt);
+                if(newLo.length() < 2) {
+                    newLo = "0" + newLo;
+                }
+                for(int j = 0; j < 2; j++) {
+                    int x = Integer.parseInt(""+ newLo.charAt(j));
+                    loByte[j] = (byte) x;
+                }
                 this.fatReader.writeBytes(dirOffset + 26, 2, loByte);
-                String sizeString = "" + size;
-                byte[] sizeByte = sizeString.getBytes();
+
+                String sizeString = String.format("%02X", size);
+                int length = sizeString.length();
+                for(int z = 0; z < 4 - length; z++) {
+                    sizeString = "0" + sizeString;
+                }
+                byte[] sizeByte = new byte[4];
+                for(int j = 0; j < 4; j++) {
+                    int x = Integer.parseInt("" + sizeString.charAt(j));
+                    sizeByte[j] = (byte) x;
+                }
                 this.fatReader.writeBytes(dirOffset + 28, 4, sizeByte);
 
                 break;
