@@ -359,11 +359,11 @@ public class CommandHandler {
                 return;
             }
             int n = getN(node.getHi(), node.getLo());
-            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-            int file = firstSecOfClus * bytesPerSec;
+//            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+//            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+//            int file = firstSecOfClus * bytesPerSec;
 
-            String result = readBytes(file, position, bytes);
+            String result = readBytes(getFileLocation(n), position, bytes);
             System.out.println(result);
         } catch(Exception e) {
             uhOh();
@@ -417,7 +417,7 @@ public class CommandHandler {
                 file = updateN(file);
             }
             if(letter.equals("A")) {
-                result.append("\n");
+                result.append("\r\n");
             }
             result.append(fatReader.convertHexToString(letter));
         }
@@ -477,7 +477,9 @@ public class CommandHandler {
 
         while(size > 0){
             int firstFreeCluster = this.freeClusterIndices.remove(0);
-            firstN = firstFreeCluster;
+            if(firstN == 0) {
+                firstN = firstFreeCluster;
+            }
             int toWrite = 0;
             if(size > this.bytesPerClus){
                 toWrite = size - this.bytesPerClus;
@@ -506,10 +508,10 @@ public class CommandHandler {
         lo = this.fatReader.convertHexToDec(lo);
         int nodeLo = Integer.parseInt(lo);
 
-        NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
+//        NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
 //        this.dirInfo.put(fileName, node);
 
-        firstN = getFileLocation(firstN);
+        int nLocation = getFileLocation(firstN);
 
         int bytesLeft = bytesToWrite;
         for(int count = 0; count < bytesToWrite; count += this.bytesPerClus){
@@ -520,9 +522,10 @@ public class CommandHandler {
                 bytesLeft -= this.bytesPerClus;
             }
             else{
-                this.fatReader.writeBytes(firstN, bytesLeft, b);
+                this.fatReader.writeBytes(nLocation, bytesLeft, b);
             }
             firstN = updateN(firstN);
+            nLocation = getFileLocation(firstN);
         }
 
         int i = this.inRootDir ? 0 : 32;
