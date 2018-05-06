@@ -414,6 +414,9 @@ public class CommandHandler {
                     (fatReader.getBytes(file + position + count, 4))) == 268435448) {
                 file = updateN(file);
             }
+            if(letter.equals("A")) {
+                result.append("\n");
+            }
             result.append(fatReader.convertHexToString(letter));
         }
         return result.toString();
@@ -521,7 +524,6 @@ public class CommandHandler {
         }
 
         int i = this.inRootDir ? 0 : 32;
-//        int i = 0;
         byte[] name = fileName.getBytes();
 
         while(true) {
@@ -539,43 +541,18 @@ public class CommandHandler {
                 this.fatReader.writeBytes(dirOffset + 11, 1, attr);
 
                 byte[] hiByte = new byte[2];
-//                int hiInt = Integer.parseInt(hi);
-//                String newHi = String.format("%02X", hiInt);
                 hiByte[0] = bytes[1];
                 hiByte[1] = bytes[0];
                 this.fatReader.writeBytes(dirOffset + 20, 2, hiByte);
 
                 byte[] loByte = new byte[2];
-//                int loInt = Integer.parseInt(lo);
-//                String newLo = String.format("%02X", loInt);
-//                if(newLo.length() < 2) {
-//                    newLo = "0" + newLo;
-//                }
-//                for(int j = 0; j < 2; j++) {
-//                    int x = Integer.parseInt(""+ newLo.charAt(j));
-//                    loByte[j] = (byte) x;
-//                }
+
                 loByte[0] = bytes[3];
                 loByte[1] = bytes[2];
                 this.fatReader.writeBytes(dirOffset + 26, 2, loByte);
 
-//                String sizeString = String.format("%02X", size);
-//                int length = sizeString.length();
-//                for(int z = 0; z < 4 - length; z++) {
-//                    sizeString = "0" + sizeString;
-//                }
-//                byte[] sizeByte = new byte[4];
-//                for(int j = 0; j < 4; j++) {
-//                    int x = Integer.parseInt("" + sizeString.charAt(j));
-//                    sizeByte[j] = (byte) x;
-//                }
-
-//                byte[] sizeByte = String.format("%02X", size).getBytes();
                 byte[] sizeByte = this.fatReader.convertDecToHexBytes(size);
                 byte[] reversedSizeByte = {sizeByte[3], sizeByte[2], sizeByte[1], sizeByte[0]};
-//                byte temp = sizeByte[0];
-//                sizeByte[0] = sizeByte[1];
-//                sizeByte[1] = temp;
 
                 this.fatReader.writeBytes(dirOffset + 28, 4, reversedSizeByte);
 
