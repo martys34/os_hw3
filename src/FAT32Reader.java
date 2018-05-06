@@ -52,7 +52,7 @@ public class FAT32Reader {
             if(i - offset > bytesPerClus) {
                 break;
             }
-            this.contents[offset] = b;
+            this.contents[i] = b;
             i++;
         }
     }
