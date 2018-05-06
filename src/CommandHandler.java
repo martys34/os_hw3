@@ -1,5 +1,7 @@
 import org.w3c.dom.Node;
 
+import javax.xml.bind.DatatypeConverter;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -551,7 +553,21 @@ public class CommandHandler {
                 loByte[1] = bytes[2];
                 this.fatReader.writeBytes(dirOffset + 26, 2, loByte);
 
-                byte[] sizeByte = this.fatReader.convertDecToHexBytes(size);
+                byte[] sizeByte = this.fatReader.convertDecToHexBytes(bytesToWrite);
+
+//                String hexSize = this.fatReader.convertDecToHex(bytesToWrite, 4).substring(2); //substring 2 to remove the "0x" in the front.
+//                byte[] sizeByte = DatatypeConverter.parseHexBinary(hexSize);
+//                StringBuilder sb = new StringBuilder();
+//                for(int i = 0; i < 8; i++){
+//                    sb.append(hexSize.charAt(i++));
+//                    sb.append(",")
+//                    sb.append(hexSize.charAt(i));
+//                }
+//                String[] split = sb.toString().split(",");
+//                for(int i = 0; i < 4; i++){
+//                    sizeByte[i] =
+//                }
+
                 byte[] reversedSizeByte = {sizeByte[3], sizeByte[2], sizeByte[1], sizeByte[0]};
 
                 this.fatReader.writeBytes(dirOffset + 28, 4, reversedSizeByte);
