@@ -307,8 +307,8 @@ public class CommandHandler {
             dir = firstSecOfClus * bytesPerSec;
             gatherData(dir);
             n = updateN(n);
-            updatedN = true;
             inRootDir = false;
+            updatedN = true;
         }
         this.currentDir = dir;
 
@@ -480,6 +480,7 @@ public class CommandHandler {
         }
 
         createNewFile(fileName, ext, size);
+        this.fatReader.flushImage();
     }
 
     private void createNewFile(String fileName, String ext, int size) {
@@ -657,6 +658,7 @@ public class CommandHandler {
         constructFreeListData();
         this.dirInfo.clear();
         gatherData(this.currentDir);
+        this.fatReader.flushImage();
     }
 
     private void uhOh() {
