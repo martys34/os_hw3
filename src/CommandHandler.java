@@ -55,7 +55,6 @@ public class CommandHandler {
         attributes.put(32, "ATTR_ARCHIVE");
 
         this.levelsIn = 0;
-        freeClusterIndices = new ArrayList<>();
 
         this.currentDir = getRootDir();
         this.inRootDir = true;
@@ -154,6 +153,8 @@ public class CommandHandler {
     }
 
     private void constructFreeListData() {
+        this.freeClusterIndices = new ArrayList<>();
+
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
@@ -356,7 +357,7 @@ public class CommandHandler {
             int position = Integer.parseInt(split[1]);
             int bytes = Integer.parseInt(split[2]);
             NodeInfo node = dirInfo.get(name);
-            if(node == null){
+            if (node == null) {
                 System.out.println("file name: " + name + " doesn't exist");
                 return;
             }
@@ -388,6 +389,20 @@ public class CommandHandler {
 
         return Integer.parseInt(fatReader.convertHexToDec
                 (this.fatReader.getBytes(fatTable + thisFATEntOffset, 4)));
+    }
+
+    /**
+     * Returns the offset within the FAT table given a value of N
+     *
+     * @param n the value N
+     * @return The offset within the FAT table
+     */
+    private int getFatTableNOffset(int n) {
+        int fatOffset = n * 4;
+        int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
+        int thisFATEntOffset = fatOffset % bytesPerSec;
+        int fatTable = thisFATSecNum * bytesPerSec;
+        return fatTable + fatOffset;
     }
 
     /**
@@ -486,6 +501,7 @@ public class CommandHandler {
                 firstN = firstFreeCluster;
             }
             if (size > this.bytesPerClus) {
+
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
@@ -578,15 +594,18 @@ public class CommandHandler {
     }
 
     public void delete(String cmd) {
-        if (!this.dirInfo.keySet().contains(cmd)) {
+        String fileName = cmd.trim().toLowerCase();
+        if (!this.dirInfo.keySet().contains(fileName)) {
             System.out.println("That file does not exist.");
             return;
         }
+        NodeInfo node = this.dirInfo.get(fileName);
+        if (node.getAttributes().equals("ATTR_DIRECTORY")) {
+            System.out.println("Deleting directories is not permitted!");
+            return;
+        }
 
-        NodeInfo node = this.dirInfo.get(cmd);
-        int size = node.getSize();
-
-        //Part 1: write to fat tables:
+        //Part 1: write zeros to fat tables:
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
@@ -595,20 +614,46 @@ public class CommandHandler {
 
         int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
 
-        while (size > 0) {
-            int firstFreeCluster = this.freeClusterIndices.remove(0);
-            if (size > this.bytesPerClus) {
-                size -= this.bytesPerClus;
-                byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
-                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
-                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
-            } else {
-                byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
-                this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
-                this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
+        int clusterNumber = getN(node.getHi(), node.getLo());
+        while (clusterNumber != 268435448 && clusterNumber != 0) {
+            byte[] bytes = this.fatReader.convertDecToHexBytes(0);
+            this.fatReader.writeToImage(fatTable + (clusterNumber * 4), bytes);
+            this.fatReader.writeToImage(fatTable2Index + (clusterNumber * 4), bytes);
+            clusterNumber = updateN(clusterNumber);
+        }
+
+        //Part 2: set first byte of file to E5
+        byte[] e5bytes = this.fatReader.convertDecToHexBytes(229);
+        int i = 0;
+        if (!inRootDir) {
+            i = 32;
+        }
+        while (true) {
+            int dirOffset = this.currentDir + i;
+
+            if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
                 break;
             }
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
+            if (check == 0 || check == 229) {
+                i += 64;
+                continue;
+            }
+
+            String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
+            if (!name.startsWith(".")) {
+                name = name.replaceFirst(" ", ".");
+            }
+            name = name.replaceAll(" ", "");
+            name = name.toLowerCase();
+            if (name.equals(node.getName())) {
+                this.fatReader.writeBytes(dirOffset, 1, e5bytes);
+                break;
+            }
+            i += 64;
         }
+        constructFreeListData();
+        gatherData(this.currentDir);
     }
 
     private void uhOh() {
