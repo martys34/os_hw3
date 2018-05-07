@@ -4,7 +4,7 @@
     <list default="true" id="e3ac9870-77ff-4be1-965e-b37aaef9468f" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/os_hw3/CommandHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/os_hw3/CommandHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CommandHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommandHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FAT32Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FAT32Reader.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,8 +28,8 @@
       <file leaf-file-name="CommandHandler.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CommandHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="145">
-              <caret line="554" column="68" selection-start-line="554" selection-start-column="68" selection-end-line="554" selection-end-column="68" />
+            <state relative-caret-position="207">
+              <caret line="382" column="23" selection-start-line="382" selection-start-column="16" selection-end-line="382" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#8916#8917#0" expanded="true" />
@@ -55,8 +55,8 @@
       <file leaf-file-name="FAT32Reader.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/FAT32Reader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="241">
-              <caret line="57" selection-start-line="57" selection-end-line="57" />
+            <state relative-caret-position="485">
+              <caret line="167" column="32" lean-forward="true" selection-start-line="167" selection-start-column="32" selection-end-line="167" selection-end-column="32" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -103,6 +103,7 @@
       <find>32</find>
       <find>attr_hid</find>
       <find>2, 0</find>
+      <find>updaten</find>
     </findStrings>
     <replaceStrings>
       <replace>System.out.println</replace>
@@ -117,8 +118,8 @@
       <list>
         <option value="$PROJECT_DIR$/src/NodeInfo.java" />
         <option value="$PROJECT_DIR$/src/main.java" />
-        <option value="$PROJECT_DIR$/src/FAT32Reader.java" />
         <option value="$PROJECT_DIR$/src/CommandHandler.java" />
+        <option value="$PROJECT_DIR$/src/FAT32Reader.java" />
       </list>
     </option>
   </component>
@@ -391,7 +392,7 @@
       <workItem from="1524010055115" duration="52000" />
       <workItem from="1524516616713" duration="14509000" />
       <workItem from="1525371593907" duration="16614000" />
-      <workItem from="1525629650253" duration="19432000" />
+      <workItem from="1525629650253" duration="21405000" />
     </task>
     <task id="LOCAL-00001" summary="&quot;command handler&quot;">
       <created>1523925491325</created>
@@ -568,15 +569,28 @@
       <option name="project" value="LOCAL" />
       <updated>1525651680627</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="pushing stuff">
+      <created>1525652772427</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1525652772427</updated>
+    </task>
+    <task id="LOCAL-00027" summary="pushing stuff">
+      <created>1525653001923</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1525653001923</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72918000" />
+    <option name="totallyTimeSpent" value="74891000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="41" y="23" width="1324" height="797" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -598,7 +612,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49921995" visible="true" weight="0.40857142" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49921995" weight="0.40857142" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -981,8 +995,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/FAT32Reader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="57" selection-start-line="57" selection-end-line="57" />
+        <state relative-caret-position="485">
+          <caret line="167" column="32" lean-forward="true" selection-start-line="167" selection-start-column="32" selection-end-line="167" selection-end-column="32" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -991,8 +1005,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CommandHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="554" column="68" selection-start-line="554" selection-start-column="68" selection-end-line="554" selection-end-column="68" />
+        <state relative-caret-position="207">
+          <caret line="382" column="23" selection-start-line="382" selection-start-column="16" selection-end-line="382" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#8916#8917#0" expanded="true" />

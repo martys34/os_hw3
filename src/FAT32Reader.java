@@ -159,4 +159,13 @@ public class FAT32Reader {
     public void writeOneByte(int offset, byte b) {
         this.contents[offset] = b;
     }
+
+    public void flushImage() {
+        try {
+            Path path = Paths.get(pathToFile);
+            Files.write(path, this.contents);
+        } catch (IOException e){
+            System.out.println(e.getStackTrace());
+        }
+    }
 }
