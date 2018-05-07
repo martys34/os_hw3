@@ -49,7 +49,7 @@ public class FAT32Reader {
     public void writeBytes(int offset, int bytesPerClus, byte[] contents) {
         int i = offset;
         for(byte b : contents) {
-            if(i - offset > bytesPerClus) {
+            if(i - offset >= bytesPerClus) {
                 break;
             }
             this.contents[i] = b;
@@ -168,4 +168,5 @@ public class FAT32Reader {
             System.out.println(e.getStackTrace());
         }
     }
+
 }

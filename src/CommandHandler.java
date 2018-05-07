@@ -495,12 +495,14 @@ public class CommandHandler {
 
         int bytesToWrite = size;
         int firstN = 0;
+        int lastN = 0;
 
         while (size > 0) {
             int firstFreeCluster = this.freeClusterIndices.remove(0);
             if (firstN == 0) {
                 firstN = firstFreeCluster;
             }
+            lastN = firstFreeCluster;
             if (size > this.bytesPerClus) {
 
                 size -= this.bytesPerClus;
@@ -516,7 +518,8 @@ public class CommandHandler {
         }
 
         //Part 2: actually create file:
-        byte[] bytes = this.fatReader.convertDecToHexBytes(firstN);
+        //TODO check here!!!!!firstN instead of lastN
+        byte[] bytes = this.fatReader.convertDecToHexBytes(lastN);
 
         int nLocation = getFileLocation(firstN);
 
@@ -536,7 +539,6 @@ public class CommandHandler {
 
         int i = this.inRootDir ? 0 : 32;
         byte[] name = fileName.getBytes();
-
         while (true) {
             int dirOffset = this.currentDir + i;
 
