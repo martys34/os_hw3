@@ -4,8 +4,6 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class interacts with the FAT32.img. It starts up by reading the bytes from FAT32.img into a byte array and then
@@ -46,10 +44,16 @@ public class FAT32Reader {
         return removeLeadingZeros(withLeadingZeros);
     }
 
-    public void writeBytes(int offset, int bytesPerClus, byte[] contents) {
+    /**
+     * Writes numBytes bytes to disk starting at offset
+     * @param offset the offset to start writing at
+     * @param numBytes the number of bytes to write
+     * @param contents the bytes to write
+     */
+    public void writeBytes(int offset, int numBytes, byte[] contents) {
         int i = offset;
         for(byte b : contents) {
-            if(i - offset >= bytesPerClus) {
+            if(i - offset >= numBytes) {
                 break;
             }
             this.contents[i] = b;
@@ -134,32 +138,39 @@ public class FAT32Reader {
         return result.toString();
     }
 
+    /**
+     * Converts the supplied int to a size 4 byte array
+     * @param dec the int to be converted
+     * @return a byte[] containing the 4 byte representation of the supplied int
+     */
     public byte[] convertDecToHexBytes(int dec) {
         return ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(dec).array();
     }
 
+    /**
+     * Writes bytes[] to disk at index in reverse order
+     * @param index the index to start writing at
+     * @param bytes the bytes to be written in reverse order
+     */
     public void writeToImage(int index, byte[] bytes){
         this.contents[index++] = bytes[3];
         this.contents[index++] = bytes[2];
         this.contents[index++] = bytes[1];
         this.contents[index] = bytes[0];
-
-//        FileOutputStream stream = null;
-//        try {
-//            stream = new FileOutputStream(this.pathToFile);
-//            stream.write(this.contents);
-//            stream.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
+    /**
+     * Writes one byte to disk at offset
+     * @param offset the offset to write the byte at
+     * @param b the byte to be written
+     */
     public void writeOneByte(int offset, byte b) {
         this.contents[offset] = b;
     }
 
+    /**
+     * Actually writes the contents of the contents array containing the FAT 32 image to a file for persistence.
+     */
     public void flushImage() {
         try {
             Path path = Paths.get(pathToFile);

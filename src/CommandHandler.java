@@ -152,6 +152,10 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Creates the freelist data. Called every time the disk starts up, as well as every time
+     * a file is deleted.
+     */
     private void constructFreeListData() {
         this.freeClusterIndices = new ArrayList<>();
 
@@ -302,9 +306,10 @@ public class CommandHandler {
         int dir = 0;
         //decimal value of EOC (end of cluster)
         while (n < 268435448) {
-            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-            dir = firstSecOfClus * bytesPerSec;
+//            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
+//            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
+//            dir = firstSecOfClus * bytesPerSec;
+            dir = getFileLocation(n);
             gatherData(dir);
             n = updateN(n);
             inRootDir = false;
@@ -445,6 +450,9 @@ public class CommandHandler {
         return result.toString();
     }
 
+    /**
+     * Prints out the first three free clusters as well as the number of free clusters.
+     */
     public void freeList() {
         System.out.println("First free cluster: " + this.freeClusterIndices.get(0));
         System.out.println("Second free cluster: " + this.freeClusterIndices.get(1));
@@ -452,6 +460,10 @@ public class CommandHandler {
         System.out.println("Number of free clusters: " + this.freeClusterIndices.size());
     }
 
+    /**
+     * Method called when newfile command is made. Checks to ensure the command is legal and then creates the file
+     * @param cmd the String containing the name of the file to be written and the size of the file
+     */
     public void newFile(String cmd) {
         String[] split = cmd.split(" ");
         if (split.length != 2) {
@@ -483,6 +495,12 @@ public class CommandHandler {
         this.fatReader.flushImage();
     }
 
+    /**
+     * Creates the file and writes "New File.\r\n" to the disk.
+     * @param fileName the name of the file
+     * @param ext the extension of the file
+     * @param size the number of bytes to be written
+     */
     private void createNewFile(String fileName, String ext, int size) {
         //Part 1: write to fat tables:
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
@@ -504,7 +522,6 @@ public class CommandHandler {
             }
             lastN = firstFreeCluster;
             if (size > this.bytesPerClus) {
-
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
@@ -578,6 +595,11 @@ public class CommandHandler {
         gatherData(this.currentDir);
     }
 
+    /**
+     * Gets the location of the file or director given a value of n
+     * @param n the value of n corresponding to the file or directory
+     * @return the offset of the file on disk
+     */
     private int getFileLocation(int n) {
         int firstDataSector = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
         int firstSecOfClus = (n - 2) * secPerClus + firstDataSector;
@@ -585,6 +607,12 @@ public class CommandHandler {
         return filelocation;
     }
 
+    /**
+     * Gets the byte[] representation of a string repeated until the number of bytes == toWrite.length()
+     * @param val the string to be repeated
+     * @param toWrite the number of bytes that will be written
+     * @return the byte[] containing the repeating bytes of val
+     */
     private byte[] getValueBytes(String val, int toWrite) {
         String toAdd = "";
         int pointer = 0;
@@ -596,6 +624,11 @@ public class CommandHandler {
         return toAdd.getBytes();
     }
 
+    /**
+     * Deletes the file matching the supplied filename from the disk. File must already exist. Directories cannot be
+     * deleted.
+     * @param cmd the name of the file to be deleted.
+     */
     public void delete(String cmd) {
         String fileName = cmd.trim().toLowerCase();
         if (!this.dirInfo.keySet().contains(fileName)) {
@@ -663,7 +696,10 @@ public class CommandHandler {
         this.fatReader.flushImage();
     }
 
-    private void uhOh() {
+    /**
+     * In the event of an unexpected crash, this message will be printed.
+     */
+    public void uhOh() {
         System.out.println("Sorry professor, we aren't sure why this failed.");
         for (int codePoint = 0x1F600; codePoint <= 0x1F64F; ) {
             System.out.print(Character.toChars(codePoint));

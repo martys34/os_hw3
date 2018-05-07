@@ -24,59 +24,41 @@ public class main {
 	    /* Main loop.  You probably want to create a helper function
             for each command besides quit. */
 
-        while(true) {
-            System.out.print("/] ");
+	    try {
+            while (true) {
+                System.out.print("/] ");
 
-            cmd_line = input.nextLine().toLowerCase();
+                cmd_line = input.nextLine().toLowerCase();
 
             /* Start comparing input */
-            if(cmd_line.startsWith("info")) {
-                ch.info();
+                if (cmd_line.startsWith("info")) {
+                    ch.info();
+                } else if (cmd_line.startsWith("stat ")) {
+                    ch.stat(cmd_line.substring(5).trim());
+                } else if (cmd_line.startsWith("volume")) {
+                    ch.volume();
+                } else if (cmd_line.startsWith("size ")) {
+                    ch.size(cmd_line.substring(5).trim());
+                } else if (cmd_line.startsWith("cd ")) {
+                    ch.cd(cmd_line.substring(3).trim());
+                } else if (cmd_line.startsWith("ls")) {
+                    ch.ls();
+                } else if (cmd_line.startsWith("read ")) {
+                    ch.read(cmd_line.substring(5).trim());
+                } else if (cmd_line.startsWith("freelist")) {
+                    ch.freeList();
+                } else if (cmd_line.startsWith("newfile ")) {
+                    ch.newFile(cmd_line.substring(8));
+                } else if (cmd_line.startsWith("delete ")) {
+                    ch.delete(cmd_line.substring(7));
+                } else if (cmd_line.startsWith("quit")) {
+                    System.out.println("Quitting.\n");
+                    break;
+                } else
+                    System.out.println("Unrecognized command.\n");
             }
-
-            else if(cmd_line.startsWith("stat ")) {
-                ch.stat(cmd_line.substring(5).trim());
-            }
-
-            else if(cmd_line.startsWith("volume")) {
-                ch.volume();
-            }
-
-            else if(cmd_line.startsWith("size ")) {
-                ch.size(cmd_line.substring(5).trim());
-            }
-
-            else if(cmd_line.startsWith("cd ")) {
-                ch.cd(cmd_line.substring(3).trim());
-            }
-
-            else if(cmd_line.startsWith("ls")) {
-                ch.ls();
-            }
-
-            else if(cmd_line.startsWith("read ")) {
-                ch.read(cmd_line.substring(5).trim());
-            }
-
-            else if(cmd_line.startsWith("freelist")) {
-                ch.freeList();
-            }
-
-            else if(cmd_line.startsWith("newfile ")){
-                ch.newFile(cmd_line.substring(8));
-            }
-
-            else if(cmd_line.startsWith("delete ")) {
-                ch.delete(cmd_line.substring(7));
-            }
-
-            else if(cmd_line.startsWith("quit")) {
-                System.out.println("Quitting.\n");
-                break;
-            }
-
-            else
-                System.out.println("Unrecognized command.\n");
+        }catch(Exception e){
+	        ch.uhOh();
         }
     }
 
