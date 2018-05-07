@@ -328,7 +328,6 @@ public class CommandHandler {
                 if (!dirInfo.get(node).getAttributes().equals("ATTR_VOLUME_ID")) {
                     result.append(node);
                     result.append("    ");
-//                    System.out.println("File: " + node);
                 }
             } catch (Exception e) {
                 System.out.println("Failed! Couldn't find ATTR for file " + node);
@@ -366,9 +365,6 @@ public class CommandHandler {
                 return;
             }
             int n = getN(node.getHi(), node.getLo());
-//            int firstDataSec = resvdSecCnt + (numFATS * FATSz) + rootDirSectors;
-//            int firstSecOfClus = (n - 2) * secPerClus + firstDataSec;
-//            int file = firstSecOfClus * bytesPerSec;
 
             String result = readBytes(getFileLocation(n), position, bytes);
             System.out.println(result);
@@ -459,7 +455,6 @@ public class CommandHandler {
                 fileName = fileName + " ";
             }
         }
-//        fileName += "txt";
 
         int size = 0;
         try {
@@ -477,7 +472,6 @@ public class CommandHandler {
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
-        int thisFATEntOffset = fatOffset % bytesPerSec;
         int bytesPerClus = bytesPerSec * this.secPerClus;
         int fatTable = thisFATSecNum * bytesPerClus;
 
@@ -491,17 +485,13 @@ public class CommandHandler {
             if (firstN == 0) {
                 firstN = firstFreeCluster;
             }
-            int toWrite = 0;
             if (size > this.bytesPerClus) {
-                toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
-//                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
             } else {
                 byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
-//                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
                 break;
@@ -510,16 +500,6 @@ public class CommandHandler {
 
         //Part 2: actually create file:
         byte[] bytes = this.fatReader.convertDecToHexBytes(firstN);
-        String hi = "" + String.format("%02X", bytes[0]) + String.format("%02X", bytes[1]);
-        hi = this.fatReader.convertHexToDec(hi);
-        int nodeHi = Integer.parseInt(hi);
-
-        String lo = "" + String.format("%02X", bytes[2]) + String.format("%02X", bytes[3]);
-        lo = this.fatReader.convertHexToDec(lo);
-        int nodeLo = Integer.parseInt(lo);
-
-//        NodeInfo node = new NodeInfo(fileName, "ATTR_ARCHIVE", nodeLo, nodeHi, bytesToWrite);
-//        this.dirInfo.put(fileName, node);
 
         int nLocation = getFileLocation(firstN);
 
@@ -568,19 +548,6 @@ public class CommandHandler {
 
                 byte[] sizeByte = this.fatReader.convertDecToHexBytes(bytesToWrite);
 
-//                String hexSize = this.fatReader.convertDecToHex(bytesToWrite, 4).substring(2); //substring 2 to remove the "0x" in the front.
-//                byte[] sizeByte = DatatypeConverter.parseHexBinary(hexSize);
-//                StringBuilder sb = new StringBuilder();
-//                for(int i = 0; i < 8; i++){
-//                    sb.append(hexSize.charAt(i++));
-//                    sb.append(",")
-//                    sb.append(hexSize.charAt(i));
-//                }
-//                String[] split = sb.toString().split(",");
-//                for(int i = 0; i < 4; i++){
-//                    sizeByte[i] =
-//                }
-
                 byte[] reversedSizeByte = {sizeByte[3], sizeByte[2], sizeByte[1], sizeByte[0]};
 
                 this.fatReader.writeBytes(dirOffset + 28, 4, reversedSizeByte);
@@ -623,21 +590,14 @@ public class CommandHandler {
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
-        int thisFATEntOffset = fatOffset % bytesPerSec;
         int bytesPerClus = bytesPerSec * this.secPerClus;
         int fatTable = thisFATSecNum * bytesPerClus;
 
         int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
 
-        int bytesToWrite = size;
-        int firstN = 0;
-
         while (size > 0) {
             int firstFreeCluster = this.freeClusterIndices.remove(0);
-            firstN = firstFreeCluster;
-            int toWrite = 0;
             if (size > this.bytesPerClus) {
-                toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
