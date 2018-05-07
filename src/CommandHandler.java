@@ -285,8 +285,8 @@ public class CommandHandler {
             if (levelsIn == 0) {
                 dirInfo.clear();
                 this.currentDir = this.rootDir;
-                gatherData(rootDir);
                 inRootDir = true;
+                gatherData(rootDir);
                 return;
             }
         } else {
