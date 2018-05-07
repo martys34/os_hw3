@@ -614,14 +614,6 @@ public class CommandHandler {
 
         int fatTable2Index = (thisFATSecNum + Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(36, 4)))) * bytesPerClus;
 
-        int clusterNumber = getN(node.getHi(), node.getLo());
-        while (clusterNumber != 268435448 && clusterNumber != 0) {
-            byte[] bytes = this.fatReader.convertDecToHexBytes(0);
-            this.fatReader.writeToImage(fatTable + (clusterNumber * 4), bytes);
-            this.fatReader.writeToImage(fatTable2Index + (clusterNumber * 4), bytes);
-            clusterNumber = updateN(clusterNumber);
-        }
-
         //Part 2: set first byte of file to E5
         byte[] e5bytes = this.fatReader.convertDecToHexBytes(229);
         int i = 0;
@@ -652,7 +644,18 @@ public class CommandHandler {
             }
             i += 64;
         }
+
+        int clusterNumber = getN(node.getHi(), node.getLo());
+        while (clusterNumber != 268435448 && clusterNumber != 0) {
+            byte[] bytes = this.fatReader.convertDecToHexBytes(0);
+            int currentClus = clusterNumber;
+            clusterNumber = updateN(clusterNumber);
+            this.fatReader.writeToImage(fatTable + (currentClus * 4), bytes);
+            this.fatReader.writeToImage(fatTable2Index + (currentClus * 4), bytes);
+        }
+
         constructFreeListData();
+        this.dirInfo.clear();
         gatherData(this.currentDir);
     }
 
