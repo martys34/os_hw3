@@ -66,7 +66,7 @@ public class main {
                 ch.newFile(cmd_line.substring(8));
             }
 
-            else if(cmd_line.startsWith("delete")) {
+            else if(cmd_line.startsWith("delete ")) {
                 ch.delete(cmd_line.substring(7));
             }
 

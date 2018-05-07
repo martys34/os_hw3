@@ -101,7 +101,7 @@ public class CommandHandler {
      */
     private void gatherData(int directory) {
         int i = 0;
-        if (updatedN) {
+        if (!inRootDir) {
             i = 32;
         }
         while (true) {
@@ -291,7 +291,6 @@ public class CommandHandler {
             }
         } else {
             levelsIn++;
-            inRootDir = false;
         }
         this.dots = true;
 
@@ -308,6 +307,7 @@ public class CommandHandler {
             gatherData(dir);
             n = updateN(n);
             updatedN = true;
+            inRootDir = false;
         }
         this.currentDir = dir;
 
@@ -495,12 +495,12 @@ public class CommandHandler {
                 toWrite = size - this.bytesPerClus;
                 size -= this.bytesPerClus;
                 byte[] bytes = this.fatReader.convertDecToHexBytes(this.freeClusterIndices.get(0));
-                System.out.println(fatTable);
+//                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
             } else {
                 byte[] bytes = this.fatReader.convertDecToHexBytes(268435448);
-                System.out.println(fatTable);
+//                System.out.println(fatTable);
                 this.fatReader.writeToImage(fatTable + (firstFreeCluster * 4), bytes);
                 this.fatReader.writeToImage(fatTable2Index + (firstFreeCluster * 4), bytes);
                 break;
