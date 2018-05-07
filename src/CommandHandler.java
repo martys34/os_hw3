@@ -448,6 +448,7 @@ public class CommandHandler {
             return;
         }
         String fileName = split[0].split("\\.")[0];
+        String ext = split[0].split("\\.")[1];
         if (fileName.length() > 8) {
             System.out.println("filename must be 8 characters or less");
             return;
@@ -468,10 +469,10 @@ public class CommandHandler {
             return;
         }
 
-        createNewFile(fileName, size);
+        createNewFile(fileName, ext, size);
     }
 
-    private void createNewFile(String fileName, int size) {
+    private void createNewFile(String fileName, String ext, int size) {
         //Part 1: write to fat tables:
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
@@ -548,10 +549,11 @@ public class CommandHandler {
             Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
             if (check == 0 || check == 229) {
                 this.fatReader.writeBytes(dirOffset, 8, name);
-                byte[] type = "TXT".getBytes();
+                byte[] type = ext.getBytes();
                 this.fatReader.writeBytes(dirOffset + 8, 3, type);
-                byte[] attr = {2, 0};
-                this.fatReader.writeBytes(dirOffset + 11, 1, attr);
+                byte[] attr = this.fatReader.convertDecToHexBytes(32);
+                byte[] attrRev = {attr[3], attr[2], attr[1], attr[0]};
+                this.fatReader.writeBytes(dirOffset + 11, 1, attrRev);
 
                 byte[] hiByte = new byte[2];
                 hiByte[0] = bytes[1];
