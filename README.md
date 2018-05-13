@@ -25,6 +25,9 @@ The cd, and size function exactly like stat as well.
 
 The info, freelist and ls work by just typing in "info" or "ls".
 
+If the working directory has other directories one could cd into, doing an ls on the directory will show the contents of the directory.
+Example: <code>ls dir</code> will do an ls on the directory called dir without changing the working directory. 
+
 The read command works by typing "read" followed by the file to be read, the starting byte position, and the number of bytes to read.
 Example: <code>read const.txt 0 1000</code> will read the from const.txt starting from the first byte to the 1000th byte.
 
