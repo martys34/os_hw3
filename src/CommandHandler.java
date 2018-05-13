@@ -340,7 +340,7 @@ public class CommandHandler {
             return;
         }
         //check if user is doing an ls on a dir
-        if(!cmd.isEmpty()){
+        if (!cmd.isEmpty()) {
             cd(cmd);
             ls("");
             cd("..");
@@ -450,7 +450,7 @@ public class CommandHandler {
      * Reads bytes from a file represented as an integer offset found in the FAT32 img. Reading starts at
      * the position supplied, and reads the bytes (supplied) number of bytes starting from position
      *
-     * @param n     the offset of the file to be read in the fat table
+     * @param n        the offset of the file to be read in the fat table
      * @param position where to start reading
      * @param bytes    how many bytes to read
      * @return a String containing the bytes read from the file
@@ -459,12 +459,12 @@ public class CommandHandler {
         //determine position:
         int startPos = position;
         int clusterNum = 0;
-        while(startPos >= bytesPerClus){
+        while (startPos >= bytesPerClus) {
             startPos -= bytesPerClus;
             clusterNum++;
         }
         int file = getFileLocation(n);
-        for(int i = 0; i < clusterNum; i++){
+        for (int i = 0; i < clusterNum; i++) {
             n = updateN(n);
             file = getFileLocation(n);
         }
@@ -474,7 +474,7 @@ public class CommandHandler {
         for (int count = 0; count < bytes; count++) {
             String letter = fatReader.getBytes(file + startPos + fileChangeCounter, 1);
             fileChangeCounter++;
-            if(fileChangeCounter == this.bytesPerClus){
+            if (fileChangeCounter == this.bytesPerClus) {
                 fileChangeCounter = 0;
                 n = updateN(n);
                 file = getFileLocation(n);
@@ -500,6 +500,7 @@ public class CommandHandler {
 
     /**
      * Method called when newfile command is made. Checks to ensure the command is legal and then creates the file
+     *
      * @param cmd the String containing the name of the file to be written and the size of the file
      */
     public void newFile(String cmd) {
@@ -535,9 +536,10 @@ public class CommandHandler {
 
     /**
      * Creates the file and writes "New File.\r\n" to the disk.
+     *
      * @param fileName the name of the file
-     * @param ext the extension of the file
-     * @param size the number of bytes to be written
+     * @param ext      the extension of the file
+     * @param size     the number of bytes to be written
      */
     private void createNewFile(String fileName, String ext, int size) {
         //Part 1: write to fat tables:
@@ -624,15 +626,13 @@ public class CommandHandler {
                 this.fatReader.writeBytes(dirOffset + 28, 4, reversedSizeByte);
 
 
-
                 break;
             }
             i += 64;
         }
-        if(this.currentDir == this.rootDir){
+        if (this.currentDir == this.rootDir) {
             gatherData(this.currentDir);
-        }
-        else {
+        } else {
             String curDir = this.dirNames.peek();
             cd("..");
             cd(curDir);
@@ -641,6 +641,7 @@ public class CommandHandler {
 
     /**
      * Gets the location of the file or director given a value of n
+     *
      * @param n the value of n corresponding to the file or directory
      * @return the offset of the file on disk
      */
@@ -653,7 +654,8 @@ public class CommandHandler {
 
     /**
      * Gets the byte[] representation of a string repeated until the number of bytes == toWrite.length()
-     * @param val the string to be repeated
+     *
+     * @param val     the string to be repeated
      * @param toWrite the number of bytes that will be written
      * @return the byte[] containing the repeating bytes of val
      */
@@ -671,6 +673,7 @@ public class CommandHandler {
     /**
      * Deletes the file matching the supplied filename from the disk. File must already exist. Directories cannot be
      * deleted.
+     *
      * @param cmd the name of the file to be deleted.
      */
     public void delete(String cmd) {
@@ -698,38 +701,35 @@ public class CommandHandler {
         int clusterNumber = getN(node.getHi(), node.getLo());
         int fileLocation = this.currentDir;
 
-//        while(clusterNumber != 268435448) {
-            int i = 0;
-            if (fileLocation != this.rootDir) {
-                i = 32;
+        int i = 0;
+        if (fileLocation != this.rootDir) {
+            i = 32;
+        }
+        while (true) {
+            int dirOffset = fileLocation + i;
+
+            if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+                break;
             }
-            while (true) {
-                int dirOffset = fileLocation + i;
-
-                if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
-                    break;
-                }
-                Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
-                if (check == 0 || check == 229) {
-                    i += 64;
-                    continue;
-                }
-
-                String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
-                if (!name.startsWith(".")) {
-                    name = name.replaceFirst(" ", ".");
-                }
-                name = name.replaceAll(" ", "");
-                name = name.toLowerCase();
-                if (name.equals(node.getName())) {
-                    this.fatReader.writeBytes(dirOffset, 1, e5bytes);
-                    break;
-                }
+            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
+            if (check == 0 || check == 229) {
                 i += 64;
+                continue;
             }
-//            clusterNumber = updateN(clusterNumber);
-//            fileLocation = getFileLocation(clusterNumber);
-//        }
+
+            String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
+            if (!name.startsWith(".")) {
+                name = name.replaceFirst(" ", ".");
+            }
+            name = name.replaceAll(" ", "");
+            name = name.toLowerCase();
+            if (name.equals(node.getName())) {
+                this.fatReader.writeBytes(dirOffset, 1, e5bytes);
+                break;
+            }
+            i += 64;
+        }
+
         clusterNumber = getN(node.getHi(), node.getLo());
         while (clusterNumber != 268435448) {
             byte[] bytes = this.fatReader.convertDecToHexBytes(0);
@@ -740,11 +740,10 @@ public class CommandHandler {
         }
 
         constructFreeListData();
-//        this.dirInfo.clear();
-        if(this.currentDir == this.rootDir){
+        if (this.currentDir == this.rootDir) {
+            this.dirInfo.clear();
             gatherData(this.currentDir);
-        }
-        else {
+        } else {
             String curDir = this.dirNames.peek();
             cd("..");
             cd(curDir);
