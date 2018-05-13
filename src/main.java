@@ -24,13 +24,14 @@ public class main {
 	    /* Main loop.  You probably want to create a helper function
             for each command besides quit. */
 
-	    try {
-            while (true) {
+
+        while (true) {
+            try {
                 System.out.print("/] ");
 
                 cmd_line = input.nextLine().toLowerCase();
 
-            /* Start comparing input */
+                /* Start comparing input */
                 if (cmd_line.startsWith("info")) {
                     ch.info();
                 } else if (cmd_line.startsWith("stat ")) {
@@ -42,7 +43,7 @@ public class main {
                 } else if (cmd_line.startsWith("cd ")) {
                     ch.cd(cmd_line.substring(3).trim());
                 } else if (cmd_line.startsWith("ls")) {
-                    ch.ls();
+                    ch.ls(cmd_line.substring(2));
                 } else if (cmd_line.startsWith("read ")) {
                     ch.read(cmd_line.substring(5).trim());
                 } else if (cmd_line.startsWith("freelist")) {
@@ -56,9 +57,9 @@ public class main {
                     break;
                 } else
                     System.out.println("Unrecognized command.\n");
+            } catch (Exception e) {
+                ch.uhOh();
             }
-        }catch(Exception e){
-	        ch.uhOh();
         }
     }
 

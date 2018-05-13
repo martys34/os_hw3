@@ -35,6 +35,8 @@ public class CommandHandler {
     private int rootDir;
     private boolean inRootDir;
 
+    private Stack<String> dirNames;
+
     /**
      * Starts up by setting the root directory as the current directory by calling getRootDir(), and then at the end
      * it loads up all information needed about that directory to process ls and stat commands
@@ -59,6 +61,8 @@ public class CommandHandler {
         this.currentDir = getRootDir();
         this.inRootDir = true;
         this.rootDir = currentDir;
+        this.dirNames = new Stack<>();
+        this.dirNames.push("/");
         gatherData(this.currentDir);
         constructFreeListData();
     }
@@ -286,6 +290,7 @@ public class CommandHandler {
             return;
         }
         if (cmd.equals("..")) {
+            this.dirNames.pop();
             levelsIn--;
             if (levelsIn == 0) {
                 dirInfo.clear();
@@ -295,6 +300,7 @@ public class CommandHandler {
                 return;
             }
         } else {
+            this.dirNames.push(node.getName());
             levelsIn++;
         }
         this.dots = true;
@@ -318,6 +324,7 @@ public class CommandHandler {
         this.currentDir = dir;
 
         this.dots = false;
+        this.inRootDir = true;
         updatedN = false;
     }
 
@@ -325,7 +332,20 @@ public class CommandHandler {
      * Uses the keyset from "dirInfo" to return the names of all files/directories in the current directory.  Checks to
      * make sure they are not the root directory of the file tree before returning them.
      */
-    public void ls() {
+    public void ls(String cmd) {
+        cmd = cmd.trim().toLowerCase();
+        NodeInfo n = dirInfo.get(cmd);
+        if (n == null && !cmd.isEmpty()) {
+            System.out.println("Error: file/directory does not exist.");
+            return;
+        }
+        //check if user is doing an ls on a dir
+        if(!cmd.isEmpty()){
+            cd(cmd);
+            ls("");
+            cd("..");
+            return;
+        }
         StringBuilder result = new StringBuilder();
         List<String> sortedNames = new ArrayList<>(dirInfo.keySet());
         Collections.sort(sortedNames);
@@ -372,10 +392,11 @@ public class CommandHandler {
             }
             int n = getN(node.getHi(), node.getLo());
 
-            String result = readBytes(getFileLocation(n), position, bytes);
+            String result = readBytes(n, position, bytes);
             System.out.println(result);
         } catch (Exception e) {
-            uhOh();
+//            uhOh();
+            e.printStackTrace();
         }
     }
 
@@ -429,23 +450,41 @@ public class CommandHandler {
      * Reads bytes from a file represented as an integer offset found in the FAT32 img. Reading starts at
      * the position supplied, and reads the bytes (supplied) number of bytes starting from position
      *
-     * @param file     the offset of the file to be read
+     * @param n     the offset of the file to be read in the fat table
      * @param position where to start reading
      * @param bytes    how many bytes to read
      * @return a String containing the bytes read from the file
      */
-    private String readBytes(int file, int position, int bytes) {
+    private String readBytes(int n, int position, int bytes) {
+        //determine position:
+        //todo determine position if not zero
+        int startPos = position;
+        int clusterNum = 0;
+        while(startPos >= bytesPerClus){
+            startPos -= bytesPerClus;
+            clusterNum++;
+        }
+        int file = getFileLocation(n);
+        for(int i = 0; i < clusterNum; i++){
+            n = updateN(n);
+            file = getFileLocation(n);
+        }
+
         StringBuilder result = new StringBuilder();
+        int fileChangeCounter = 0;
         for (int count = 0; count < bytes; count++) {
-            String letter = fatReader.getBytes(file + position + count, 1);
-            if (Integer.parseInt(fatReader.convertHexToDec
-                    (fatReader.getBytes(file + position + count, 4))) == 268435448) {
-                file = updateN(file);
+            String letter = fatReader.getBytes(file + startPos + fileChangeCounter, 1);
+            fileChangeCounter++;
+            if(fileChangeCounter == this.bytesPerClus){
+                fileChangeCounter = 0;
+                n = updateN(n);
+                file = getFileLocation(n);
             }
             if (letter.equals("A")) {
                 result.append("\r\n");
             }
             result.append(fatReader.convertHexToString(letter));
+
         }
         return result.toString();
     }
@@ -551,7 +590,7 @@ public class CommandHandler {
             nLocation = getFileLocation(firstN);
         }
 
-        int i = this.inRootDir ? 0 : 32;
+        int i = this.currentDir == this.rootDir ? 0 : 32;
         byte[] name = fileName.getBytes();
         while (true) {
             int dirOffset = this.currentDir + i;
@@ -589,7 +628,14 @@ public class CommandHandler {
             }
             i += 64;
         }
-        gatherData(this.currentDir);
+        if(this.currentDir == this.rootDir){
+            gatherData(this.currentDir);
+        }
+        else {
+            String curDir = this.dirNames.peek();
+            cd("..");
+            cd(curDir);
+        }
     }
 
     /**
@@ -650,7 +696,7 @@ public class CommandHandler {
         //Part 2: set first byte of file to E5
         byte[] e5bytes = this.fatReader.convertDecToHexBytes(229);
         int i = 0;
-        if (!inRootDir) {
+        if (this.currentDir != this.rootDir) {
             i = 32;
         }
         while (true) {
