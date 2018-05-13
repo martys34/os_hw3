@@ -623,6 +623,8 @@ public class CommandHandler {
 
                 this.fatReader.writeBytes(dirOffset + 28, 4, reversedSizeByte);
 
+
+
                 break;
             }
             i += 64;

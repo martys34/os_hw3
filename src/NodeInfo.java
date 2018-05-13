@@ -17,7 +17,7 @@ public class NodeInfo {
      * @param hi the hi value of the node
      * @param size the size of the node
      */
-    public NodeInfo(String name, String attr, int lo, int hi, int size){
+    public NodeInfo(String name, String attr, int lo, int hi, int size) {
         this.name = name;
         this.attributes = attr;
         this.lo = lo;
@@ -64,6 +64,5 @@ public class NodeInfo {
     public int getSize() {
         return size;
     }
-
 
 }
