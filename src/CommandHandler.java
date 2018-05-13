@@ -552,6 +552,10 @@ public class CommandHandler {
         int bytesToWrite = size;
         int firstN = 0;
 
+        long timeCreated = System.currentTimeMillis();
+        Date date = new Date();
+        String[] dateStrings = date.toString().split(" ");
+
         while (size > 0) {
             int firstFreeCluster = this.freeClusterIndices.remove(0);
             if (firstN == 0) {
