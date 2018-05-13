@@ -457,7 +457,6 @@ public class CommandHandler {
      */
     private String readBytes(int n, int position, int bytes) {
         //determine position:
-        //todo determine position if not zero
         int startPos = position;
         int clusterNum = 0;
         while(startPos >= bytesPerClus){
@@ -684,7 +683,6 @@ public class CommandHandler {
             return;
         }
 
-        //Part 1: write zeros to fat tables:
         int n = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(44, 4))); //2
         int fatOffset = n * 4;
         int thisFATSecNum = resvdSecCnt + (fatOffset / bytesPerSec);
@@ -695,37 +693,43 @@ public class CommandHandler {
 
         //Part 2: set first byte of file to E5
         byte[] e5bytes = this.fatReader.convertDecToHexBytes(229);
-        int i = 0;
-        if (this.currentDir != this.rootDir) {
-            i = 32;
-        }
-        while (true) {
-            int dirOffset = this.currentDir + i;
-
-            if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
-                break;
-            }
-            Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
-            if (check == 0 || check == 229) {
-                i += 64;
-                continue;
-            }
-
-            String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
-            if (!name.startsWith(".")) {
-                name = name.replaceFirst(" ", ".");
-            }
-            name = name.replaceAll(" ", "");
-            name = name.toLowerCase();
-            if (name.equals(node.getName())) {
-                this.fatReader.writeBytes(dirOffset, 1, e5bytes);
-                break;
-            }
-            i += 64;
-        }
-
         int clusterNumber = getN(node.getHi(), node.getLo());
-        while (clusterNumber != 268435448 && clusterNumber != 0) {
+        int fileLocation = this.currentDir;
+
+//        while(clusterNumber != 268435448) {
+            int i = 0;
+            if (fileLocation != this.rootDir) {
+                i = 32;
+            }
+            while (true) {
+                int dirOffset = fileLocation + i;
+
+                if (i >= 512) {   //fatReader.removeLeadingZeros(fatReader.getBytes(dirOffset, 32)).equals("0")) {
+                    break;
+                }
+                Integer check = Integer.parseInt(fatReader.convertHexToDec(fatReader.getBytes(dirOffset, 1)));
+                if (check == 0 || check == 229) {
+                    i += 64;
+                    continue;
+                }
+
+                String name = fatReader.convertHexToString(fatReader.getBytes(dirOffset, 11));
+                if (!name.startsWith(".")) {
+                    name = name.replaceFirst(" ", ".");
+                }
+                name = name.replaceAll(" ", "");
+                name = name.toLowerCase();
+                if (name.equals(node.getName())) {
+                    this.fatReader.writeBytes(dirOffset, 1, e5bytes);
+                    break;
+                }
+                i += 64;
+            }
+//            clusterNumber = updateN(clusterNumber);
+//            fileLocation = getFileLocation(clusterNumber);
+//        }
+        clusterNumber = getN(node.getHi(), node.getLo());
+        while (clusterNumber != 268435448) {
             byte[] bytes = this.fatReader.convertDecToHexBytes(0);
             int currentClus = clusterNumber;
             clusterNumber = updateN(clusterNumber);
@@ -734,8 +738,15 @@ public class CommandHandler {
         }
 
         constructFreeListData();
-        this.dirInfo.clear();
-        gatherData(this.currentDir);
+//        this.dirInfo.clear();
+        if(this.currentDir == this.rootDir){
+            gatherData(this.currentDir);
+        }
+        else {
+            String curDir = this.dirNames.peek();
+            cd("..");
+            cd(curDir);
+        }
         this.fatReader.flushImage();
     }
 
